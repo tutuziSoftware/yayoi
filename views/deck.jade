@@ -1,0 +1,15 @@
+extends layout
+
+block content
+	script(src="/javascripts/deck_client.js")
+	h1 deck screen
+	
+	div(ng-controller="deckController")
+		button(ng-click="upload()") デッキを登録する
+		ul
+			li(ng-repeat="card in cards")
+				{{card.name}}
+				div {{card.caption}}
+				div デッキ投入枚数：{{deck[card.name] === undefined ? 0 : deck[card.name]}}
+				button(ng-click="add(card.name)") このカードを1枚デッキに加える
+				button(ng-click="remove(card.name)") このカードを1枚デッキから外す
