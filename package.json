@@ -13,7 +13,7 @@
     "body-parser": "*",
     "mongoose": "*",
     "socket.io": "*",
-    "xmlhttprequest": "*"
+    "xmlhttprequest": "*",
     "cookie": "*"
   }
 }
