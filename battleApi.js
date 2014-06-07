@@ -3,8 +3,13 @@ exports.api = function(session, store){
 		console.log("connection");
 	
 		socket.on("shuffle", function(data){
+			console.log("shuffle");
+			
 			getSession(socket, function(error, session){
+				console.log("shuffle - getSession");
+				
 				if(error) {
+					console.log("shuffle - error emit");
 					socket.emit("error", "");
 					return;
 				}
