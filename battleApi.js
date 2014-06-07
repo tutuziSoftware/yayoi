@@ -50,9 +50,7 @@ exports.api = function(session, store){
 					});
 				}
 				
-				console.log(session);
 				session.cloneField = test;
-				console.log(session);
 				
 				socket.emit("first draw", test);
 			});
@@ -76,7 +74,7 @@ exports.api = function(session, store){
 		
 		socket.on("clone field?", function(){
 			getSession(socket, function(error, session){
-				console.log(session);
+				console.log("clone field!");
 				var cloneField = "cloneField" in session ? session.cloneField : null;
 				socket.emit("clone field!", cloneField);
 			});
@@ -90,6 +88,8 @@ exports.api = function(session, store){
 	 * @param function(error, session) callback
 	 */
 	function getSession(socket, callback){
+		if(getSession.test !== void 0) callback(null, getSession.test);
+		
 		var cookie = require('cookie').parse(socket.request.headers.cookie);
 		var memoryStore = new session.MemoryStore;
 	
@@ -97,6 +97,9 @@ exports.api = function(session, store){
 			callback(true, null);
 		}
 	
-		store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], callback);
+		store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], function(error, session){
+			getSession.test = session;
+			callback(error, session);
+		});
 	}
 };

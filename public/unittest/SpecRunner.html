@@ -42,7 +42,7 @@
 					done();
 				});
 		
-				socket.emit("shuffle", "");
+				socket.emit("shuffle");
 			});
 			
 			it("shuffle API直後のクローンフィールド", function(done){
@@ -51,11 +51,17 @@
 					expect(field.i).toBeDefined();
 					expect(field.i.hands.length).toEqual(5);
 					expect(field.i.life).toEqual(20);
+					console.log("colne field!");
+					console.log(socket);
+					socket.removeListener("clone field", arguments.callee);
 					done();
 				});
 				
-				socket.emit("clone field?", "");
+				console.log("clone field?");
+				socket.emit("clone field?");
 			});
+			
+			it("灰色熊を場に出す");
 		});
 	</script>
 </head>
