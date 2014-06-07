@@ -9,6 +9,7 @@
 
   <script type="text/javascript" src="lib/jasmine-2.0.0/jasmine.js"></script>
   <script type="text/javascript" src="lib/jasmine-2.0.0/jasmine-html.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="lib/jasmine-2.0.0/boot.js"></script>
 
   <!-- include source files here... -->
@@ -18,16 +19,30 @@
   <!-- include spec files here... -->
 	<script>
 		describe("クローンプレイヤーの動作", function(){
-			it("ログイン", function(done){
+			var socket;
+			
+			beforeEach(function(done){
 				$.post("/login", {
 					"userName":"puruhime",
 					"password":"puruhime"
 				}, function(data){
-					done();
+					socket = io.connect('http://localhost:3000/battle/tester');
+					
+					socket.on("connect", function(){
+						done();
+					});
 				});
 			});
 			
-			it("shuffle");
+			it("shuffle", function(done){
+				socket.on("first draw", function(field){
+					console.log(field);
+					expect(field).toBeDefined();
+					done();
+				});
+		
+				socket.emit("shuffle", "");
+			});
 		});
 	</script>
 </head>
