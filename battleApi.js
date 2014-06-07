@@ -9,18 +9,19 @@ exports.api = function(session, store){
 				console.log("shuffle - getSession");
 				
 				if(error) {
-					console.log("shuffle - error emit");
-					socket.emit("error", "");
+					console.log("shuffle - error");
 					return;
 				}
 				
-				//TODO フィールド情報を生成する
-				//TODO セッションに記録する
+				if(session === void 0){
+					console.log("shuffle - error session is undefined");
+					return;
+				}
 				
 				var test = {
 					//自分の情報		
 					"i":{
-						"life":10,
+						"life":20,
 						"mana":0,
 						"creatures":[],
 						"enchantFields":[],
@@ -48,6 +49,11 @@ exports.api = function(session, store){
 						"toughness":2
 					});
 				}
+				
+				console.log(session);
+				session.cloneField = test;
+				console.log(session);
+				
 				socket.emit("first draw", test);
 			});
 		});
@@ -66,6 +72,14 @@ exports.api = function(session, store){
 		
 		socket.on("attack step", function(){
 			console.log("attack step");
+		});
+		
+		socket.on("clone field?", function(){
+			getSession(socket, function(error, session){
+				console.log(session);
+				var cloneField = "cloneField" in session ? session.cloneField : null;
+				socket.emit("clone field!", cloneField);
+			});
 		});
 	};
 	

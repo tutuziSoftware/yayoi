@@ -18,7 +18,7 @@
 
   <!-- include spec files here... -->
 	<script>
-		describe("クローンプレイヤーの動作", function(){
+		describe("クローンフィールドの動作", function(){
 			var socket;
 			
 			beforeEach(function(done){
@@ -43,6 +43,18 @@
 				});
 		
 				socket.emit("shuffle", "");
+			});
+			
+			it("shuffle API直後のクローンフィールド", function(done){
+				socket.on("clone field!", function(field){
+					expect(field).toBeDefined();
+					expect(field.i).toBeDefined();
+					expect(field.i.hands.length).toEqual(5);
+					expect(field.i.life).toEqual(20);
+					done();
+				});
+				
+				socket.emit("clone field?", "");
 			});
 		});
 	</script>
