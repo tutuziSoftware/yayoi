@@ -88,7 +88,7 @@ exports.api = function(session, store){
 	 * @param function(error, session) callback
 	 */
 	function getSession(socket, callback){
-		if(getSession.test !== void 0) callback(null, getSession.test);
+		if(getSession.session !== void 0) callback(null, getSession.session);
 		
 		var cookie = require('cookie').parse(socket.request.headers.cookie);
 		var memoryStore = new session.MemoryStore;
@@ -98,7 +98,7 @@ exports.api = function(session, store){
 		}
 	
 		store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], function(error, session){
-			getSession.test = session;
+			getSession.session = session;
 			callback(error, session);
 		});
 	}
