@@ -19,64 +19,72 @@
 			var socket;
 			
 			beforeEach(function(done){
+				if(socket) return;
+				
 				//ログイン + socket.ioで通信可能にする
 				$.post("/login", {
 					"userName":"puruhime",
 					"password":"puruhime"
 				}, function(data){
 					socket = io.connect('http://localhost:3000/battle/tester');
-					
+				
 					socket.on("connect", function(){
+						console.log("beforeEach - connect");
 						done();
 					});
 				});
-			});
-			
-			var field;
 				
-			it("shuffle APIの使用", function(done){
-				socket.on("first draw", function(_field){
-					console.log(_field);
-					expect(_field).toBeDefined();
-					field = _field;
-					done();
-				});
-	
-				console.log("shuffle");
-				socket.emit("shuffle");
+				console.log("beforeEach");
 			});
 			
-			it("shuffle API直後のクローンフィールド", function(done){
-				socket.on("clone field!", function(_field){
-					expect(_field).toBeDefined();
-					expect(_field.i).toBeDefined();
-					expect(_field.i.hands.length).toEqual(5);
-					expect(_field.i.life).toEqual(20);
-					console.log("colne field!");
-					socket.removeListener("clone field!", arguments.callee);
-					done();
-				});
-			
-				console.log("clone field?");
-				socket.emit("clone field?");
-			});
-			
-			/*
-			it("灰色熊を場に出す", function(done){
-				socket.on("clone field!", function(_field){
-					expect(_field).toBeDefined();
-					expect(_field.i).toBeDefined();
-					expect(_field.i.hands.length).toEqual(4);
-					expect(_field.i.creatures.length).toEqual(1);
-					expect(_field.i.creatures[0].id).toEqual(field.i.hands[1].id);
-					done();
+			describe("フィールド形成", function(){
+				var field;
+				
+				it("shuffle APIの使用", function(done){
+					socket.on("first draw", function(_field){
+						console.log("first draw");
+						expect(_field).toBeDefined();
+						field = _field;
+						socket.removeListener("first draw", arguments.callee);
+						done();
+					});
+		
+					console.log("shuffle");
+					socket.emit("shuffle");
 				});
 				
-				socket.emit("hand to mana", field.i.hands[0].id);
-				socket.emit("play", field.i.hands[1].id);
-				socket.emit("clone field?");
+				it("shuffle API直後のクローンフィールド", function(done){
+					socket.on("clone field!", function(_field){
+						expect(_field).toBeDefined();
+						expect(_field.i).toBeDefined();
+						expect(_field.i.hands.length).toEqual(5);
+						expect(_field.i.life).toEqual(20);
+						console.log("clone field!");
+						socket.removeListener("clone field!", arguments.callee);
+						done();
+					});
+				
+					console.log("clone field?");
+					socket.emit("clone field?");
+				});
+				
+				/*
+				it("灰色熊を場に出す", function(done){
+					socket.on("clone field!", function(_field){
+						expect(_field).toBeDefined();
+						expect(_field.i).toBeDefined();
+						expect(_field.i.hands.length).toEqual(4);
+						expect(_field.i.creatures.length).toEqual(1);
+						expect(_field.i.creatures[0].id).toEqual(field.i.hands[1].id);
+						done();
+					});
+					
+					socket.emit("hand to mana", field.i.hands[0].id);
+					socket.emit("play", field.i.hands[1].id);
+					socket.emit("clone field?");
+				});
+				*/
 			});
-			*/
 		});
 	</script>
 </head>
