@@ -22,6 +22,7 @@
 			var socket;
 			
 			beforeEach(function(done){
+				//ログイン + socket.ioで通信可能にする
 				$.post("/login", {
 					"userName":"puruhime",
 					"password":"puruhime"
@@ -34,7 +35,7 @@
 				});
 			});
 			
-			it("shuffle", function(done){
+			it("shuffle APIの使用", function(done){
 				socket.on("first draw", function(field){
 					console.log(field);
 					expect(field).toBeDefined();
