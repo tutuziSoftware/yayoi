@@ -73,8 +73,24 @@ exports.api = function(session, store){
 			});
 		});
 		
-		socket.on("play", function(){
+		socket.on("play", function(cardId){
 			console.log("play");
+			var engine = require("./public/javascripts/battle_engine.js");
+			
+			getSession(socket, function(error, session){
+				session.cloneField.i.hands.every(function(hand, i){
+					if(cardId == hand.id){
+						console.log("play - hand");
+						console.log(hand);
+						engine.doEnterBattlefield.apply({
+							card: hand
+						}, {
+							field: session.cloneField
+						});
+						return false;
+					}
+				});
+			});
 		});
 		
 		socket.on("activated ability", function(){
