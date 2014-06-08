@@ -64,17 +64,24 @@
 				});
 				
 				it("shuffle API直後のクローンフィールド", function(done){
-					var run = false;
-					
 					socket.on("clone field!", function(_field){
-						if(run) return;
-						run = true;
+						
+						/*
+						 * 状況：
+						 * 		1.APIを一度叩いたはずが二度返答が来る
+						 * 		1.二度目以降のclone field! APIがフィールド情報を返さない
+						 *
+						 * TODO 二度目以降もclone field! APIがフィールド情報を返すようにしたい
+						 * TODO 二度APIから返事がこないようにしたい
+						 */
+						
+						console.log(_field);
 						expect(_field).toBeDefined();
 						expect(_field.i).toBeDefined();
 						expect(_field.i.hands.length).toEqual(5);
 						expect(_field.i.life).toEqual(20);
-						socket.removeListener("clone field!", arguments.callee);
-						console.log("clone field! - end");
+						//socket.removeListener("clone field!", arguments.callee);
+						console.log("clone field!");
 						done();
 					});
 					
@@ -85,7 +92,11 @@
 				
 				/*
 				it("灰色熊を場に出す", function(done){
+					var run = false;
+					
 					socket.on("clone field!", function(_field){
+						if(run) return;
+						run = true;
 						expect(_field).toBeDefined();
 						expect(_field.i).toBeDefined();
 						expect(_field.i.hands.length).toEqual(4);

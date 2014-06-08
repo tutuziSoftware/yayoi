@@ -95,7 +95,11 @@ exports.api = function(session, store){
 	 * @param function(error, session) callback
 	 */
 	function getSession(socket, callback){
-		if(getSession.session !== void 0) callback(null, getSession.session);
+		if(getSession.session !== void 0){
+			console.log("getSession.session");
+			console.log(getSession.session);
+			callback(null, getSession.session);
+		}
 		
 		var cookie = require('cookie').parse(socket.request.headers.cookie);
 		var memoryStore = new session.MemoryStore;
