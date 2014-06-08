@@ -99,6 +99,7 @@ exports.api = function(session, store){
 			console.log("getSession.session");
 			console.log(getSession.session);
 			callback(null, getSession.session);
+			return;
 		}
 		
 		var cookie = require('cookie').parse(socket.request.headers.cookie);

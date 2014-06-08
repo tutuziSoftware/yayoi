@@ -65,16 +65,6 @@
 				
 				it("shuffle API直後のクローンフィールド", function(done){
 					socket.on("clone field!", function(_field){
-						
-						/*
-						 * 状況：
-						 * 		1.APIを一度叩いたはずが二度返答が来る
-						 * 		1.二度目以降のclone field! APIがフィールド情報を返さない
-						 *
-						 * TODO 二度目以降もclone field! APIがフィールド情報を返すようにしたい
-						 * TODO 二度APIから返事がこないようにしたい
-						 */
-						
 						console.log(_field);
 						expect(_field).toBeDefined();
 						expect(_field.i).toBeDefined();
@@ -86,7 +76,6 @@
 					});
 					
 					console.log("clone field?");
-					expect(5).toEqual(5);
 					socket.emit("clone field?");
 				});
 				
