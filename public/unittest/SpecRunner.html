@@ -19,7 +19,10 @@
 			var socket;
 			
 			beforeEach(function(done){
-				if(socket) return;
+				if(socket){
+					done();
+					return;
+				}
 				
 				//ログイン + socket.ioで通信可能にする
 				$.post("/login", {
@@ -46,21 +49,23 @@
 						expect(_field).toBeDefined();
 						field = _field;
 						socket.removeListener("first draw", arguments.callee);
+						console.log("first draw - done");
 						done();
+						console.log("first draw - done2");
 					});
 		
 					console.log("shuffle");
 					socket.emit("shuffle");
 				});
 				
-				it("shuffle API直後のクローンフィールド", function(done){
+				it("shuffle API直後のクローンフィールド", function(){
 					socket.on("clone field!", function(_field){
 						expect(_field).toBeDefined();
 						expect(_field.i).toBeDefined();
 						expect(_field.i.hands.length).toEqual(5);
 						expect(_field.i.life).toEqual(20);
-						console.log("clone field!");
 						socket.removeListener("clone field!", arguments.callee);
+						console.log("clone field!");
 						done();
 					});
 				
