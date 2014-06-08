@@ -56,8 +56,14 @@ exports.api = function(session, store){
 			});
 		});
 		
-		socket.on("hand to mana", function(){
-			console.log("hand to mana");
+		socket.on("hand to mana", function(cardId){
+			console.log("hand to mana:" + cardId);
+			console.log("getSession.session = " + getSession.session);
+			
+			getSession(socket, function(error, session){
+				console.log("hand to mana - getSession");
+				console.log(session);
+			});
 		});
 		
 		socket.on("play", function(){
