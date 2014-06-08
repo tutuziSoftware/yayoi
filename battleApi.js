@@ -75,6 +75,7 @@ exports.api = function(session, store){
 		socket.on("clone field?", function(){
 			getSession(socket, function(error, session){
 				console.log("clone field!");
+				console.log(session);
 				var cloneField = "cloneField" in session ? session.cloneField : null;
 				socket.emit("clone field!", cloneField);
 			});

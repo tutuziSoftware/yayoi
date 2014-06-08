@@ -20,9 +20,14 @@
 			
 			beforeEach(function(done){
 				if(socket){
-					done();
+					console.log("beforeEach - socket");
+					setTimeout(function(){
+						done();
+					}, 0);
 					return;
 				}
+				
+				document.cookie = "";
 				
 				//ログイン + socket.ioで通信可能にする
 				$.post("/login", {
@@ -58,18 +63,23 @@
 					socket.emit("shuffle");
 				});
 				
-				it("shuffle API直後のクローンフィールド", function(){
+				it("shuffle API直後のクローンフィールド", function(done){
+					var run = false;
+					
 					socket.on("clone field!", function(_field){
+						if(run) return;
+						run = true;
 						expect(_field).toBeDefined();
 						expect(_field.i).toBeDefined();
 						expect(_field.i.hands.length).toEqual(5);
 						expect(_field.i.life).toEqual(20);
 						socket.removeListener("clone field!", arguments.callee);
-						console.log("clone field!");
+						console.log("clone field! - end");
 						done();
 					});
-				
+					
 					console.log("clone field?");
+					expect(5).toEqual(5);
 					socket.emit("clone field?");
 				});
 				
