@@ -8,7 +8,11 @@ if(typeof window === "undefined"){
 (function(){
 
 
-//TODO angulerjsでもサーバサイドでも動くよう調整する
+/*
+現状：angulerjsで動かしていた「場に出す」「コストを支払う」機能をここにコピペした
+目標：angulerjsでもサーバサイドでも動くよう調整する
+TODO angulerjsでもサーバサイドでも動くよう調整する
+*/
 battle.doEnterBattlefield = function($scope){
 	//場に出せないカードの場合、はじく
 	var cardType = this.card.cardType;
