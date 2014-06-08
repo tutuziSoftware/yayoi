@@ -62,7 +62,14 @@ exports.api = function(session, store){
 			
 			getSession(socket, function(error, session){
 				console.log("hand to mana - getSession");
-				console.log(session);
+				
+				session.cloneField.i.hands.every(function(hand, i){
+					if(cardId == hand.id){
+						session.cloneField.i.mana++;
+						session.cloneField.i.hands.splice(i, 1);
+						return false;
+					}
+				});
 			});
 		});
 		

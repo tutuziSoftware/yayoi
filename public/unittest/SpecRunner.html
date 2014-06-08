@@ -70,7 +70,7 @@
 						expect(_field.i).toBeDefined();
 						expect(_field.i.hands.length).toEqual(5);
 						expect(_field.i.life).toEqual(20);
-						//socket.removeListener("clone field!", arguments.callee);
+						socket.removeListener("clone field!", arguments.callee);
 						console.log("clone field!");
 						done();
 					});
@@ -79,7 +79,6 @@
 					socket.emit("clone field?");
 				});
 				
-				/*
 				it("灰色熊を場に出す", function(done){
 					var run = false;
 					
@@ -98,7 +97,6 @@
 					socket.emit("play", field.i.hands[1].id);
 					socket.emit("clone field?");
 				});
-				*/
 			});
 		});
 	</script>
