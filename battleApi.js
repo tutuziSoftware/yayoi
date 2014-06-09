@@ -98,8 +98,24 @@ exports.api = function(session, store){
 			console.log("activated ability");
 		});
 		
-		socket.on("attack step", function(){
+		socket.on("attack step", function(attackerIds){
 			console.log("attack step");
+			
+			getSession(socket, function(error, session){
+				console.log("attack step - getSession");
+				
+				attackerIds.forEach(function(attackerId){
+					session.cloneField.i.creatures.every(function(creature){
+						if(creature.id == attackerId){
+							creature.tap = true;
+							creature.isAttack = true;
+							return false;
+						}
+					});
+				});
+				
+				socket.emit("attack step");
+			});
 		});
 		
 		socket.on("clone field?", function(){

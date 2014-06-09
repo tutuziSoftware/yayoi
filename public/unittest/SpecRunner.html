@@ -90,11 +90,36 @@
 						expect(_field.i.hands.length).toEqual(3);
 						expect(_field.i.creatures.length).toEqual(1);
 						expect(_field.i.creatures[0].id).toEqual(field.i.hands[1].id);
+						socket.removeListener("clone field!", arguments.callee);
 						done();
 					});
 					
 					socket.emit("hand to mana", field.i.hands[0].id);
 					socket.emit("play", field.i.hands[1].id);
+					socket.emit("clone field?");
+				});
+				
+				it("灰色熊の戦闘", function(done){
+					socket.on("clone field!", function(field){
+						//戦闘前はタップなし
+						expect(field.i.creatures[0].tap).toEqual(void 0);
+						
+						socket.on("attack step", function(){
+							socket.on("clone field!", function(field){
+								//戦闘に参加させるとタップ & 攻撃フラグを立てる
+								expect(field.i.creatures[0].tap).toEqual(true);
+								expect(field.i.creatures[0].isAttack).toEqual(true);
+								socket.removeListener("clone field!", arguments.callee);
+								done();
+							});
+							
+							socket.emit("clone field?");
+						});
+						
+						socket.emit("attack step", [field.i.creatures[0].id]);
+						socket.removeListener("clone field!", arguments.callee);
+					});
+					
 					socket.emit("clone field?");
 				});
 			});
