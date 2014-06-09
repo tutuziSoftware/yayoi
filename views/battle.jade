@@ -2,6 +2,7 @@ extends layout
 
 block content
 	script(src="/javascripts/battle.js")
+	script(src="/javascripts/battle_engine.js")
 	div(ng-controller="fieldController")
 		button(ng-click="turnStart()") turnStart
 		button(ng-click="turnEnd()") turnEnd
