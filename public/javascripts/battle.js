@@ -45,6 +45,8 @@ function fieldController($scope, $http){
 		var cards = eval(res);
 	});
 	
+	$scope.socket = socket;
+	
 	//敵を含むすべての場のルート
 	field = $scope.field = {
 		//自分の情報		
@@ -117,20 +119,7 @@ function fieldController($scope, $http){
 	 * カードを場に出します。
 	 */
 	$scope.doEnterBattlefield = function(){
-		//場に出せないカードの場合、はじく
-		var cardType = this.card.cardType;
-		if(cardType == "mana" || cardType == "sorcery") return;
-		
-		//マナコストの支払い
-		if(doManaCost(this)){
-			if(this.card.cardType == "creature") $scope.field.i.creatures.push(this.card);
-			if(this.card.cardType == "enchantField") $scope.field.i.enchantFields.push(this.card);
-			
-			if(this.card.doEnterBattlefield) this.card.doEnterBattlefield($scope.field);
-			if(this.card.doUpkeep) $scope.field.i.upkeeps.push(this.card);
-		}
-		
-		socket.emit("play", this.card.id);
+		battle.doEnterBattlefield.call(this, $scope);
 	};
 	
 	/**
