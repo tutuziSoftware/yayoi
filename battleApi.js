@@ -82,9 +82,10 @@ exports.api = function(session, store){
 					if(cardId == hand.id){
 						console.log("play - hand");
 						console.log(hand);
-						engine.doEnterBattlefield.apply({
-							card: hand
-						}, {
+						
+						session.cloneField.card = hand;
+						
+						engine.doEnterBattlefield.call(session.cloneField, {
 							field: session.cloneField
 						});
 						return false;

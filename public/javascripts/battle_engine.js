@@ -19,7 +19,7 @@ battle.doEnterBattlefield = function($scope){
 	if(cardType == "mana" || cardType == "sorcery") return;
 	
 	//マナコストの支払い
-	if(doManaCost(this)){
+	if(doManaCost($scope, this)){
 		if(this.card.cardType == "creature") $scope.field.i.creatures.push(this.card);
 		if(this.card.cardType == "enchantField") $scope.field.i.enchantFields.push(this.card);
 		
@@ -27,13 +27,13 @@ battle.doEnterBattlefield = function($scope){
 		if(this.card.doUpkeep) $scope.field.i.upkeeps.push(this.card);
 	}
 	
-	socket.emit("play", this.card.id);
+	if($scope.socket) $scope.socket.emit("play", this.card.id);
 };
 
 /**
  * マナコストの支払いを行います。
  */
-function doManaCost(that){
+function doManaCost($scope, that){
 	//マナコストの支払い
 	if($scope.field.i.mana >= that.card.manaCost){
 		$scope.field.i.mana -= that.card.manaCost;
