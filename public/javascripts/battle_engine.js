@@ -13,6 +13,15 @@ if(typeof window === "undefined"){
 目標：angulerjsでもサーバサイドでも動くよう調整する
 TODO angulerjsでもサーバサイドでも動くよう調整する
 */
+/**
+ * $scope.field
+ * 		フィールド情報。
+ * $scope.socket
+ * 		socket.io。クライアントサイドでAPI使用時に使う。
+ *
+ * this.card
+ * 		選択したカード。
+ */
 battle.doEnterBattlefield = function($scope){
 	//場に出せないカードの場合、はじく
 	var cardType = this.card.cardType;
@@ -27,6 +36,7 @@ battle.doEnterBattlefield = function($scope){
 		if(this.card.doUpkeep) $scope.field.i.upkeeps.push(this.card);
 	}
 	
+	//クライアントサイドのみ。カードを唱えた事をクローンフィールドへ伝える。
 	if($scope.socket) $scope.socket.emit("play", this.card.id);
 };
 
