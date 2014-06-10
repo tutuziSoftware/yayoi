@@ -98,12 +98,11 @@ exports.api = function(session, store){
 			console.log("activated ability");
 		});
 		
-		socket.on("attack step", function(attackerIds){
-			console.log("attack step");
+		const ATTACK_STEP_API = "attack step";
+		socket.on(ATTACK_STEP_API, function(attackerIds){
+			console.log(ATTACK_STEP_API);
 			
 			getSession(socket, function(error, session){
-				console.log("attack step - getSession");
-				
 				var escapeAttackerIds = [];
 				
 				attackerIds.forEach(function(attackerId){
@@ -117,7 +116,9 @@ exports.api = function(session, store){
 					});
 				});
 				
+				console.log(ATTACK_STEP_API + " - emit");
 				socket.emit("attack step");
+				console.log("block step - broadcast.emit");
 				socket.broadcast.emit("block step", escapeAttackerIds);
 			});
 		});
