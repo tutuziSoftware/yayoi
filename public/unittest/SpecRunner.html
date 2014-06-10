@@ -122,27 +122,6 @@
 					
 					socket.emit("clone field?");
 				});
-				
-				it("相手のターン　～ダメージ被弾", function(done){
-					socket.on("enemy turn", function(field){
-						//灰色熊のダメージを受けた
-						expect(field.enemy.life).toEqual(18);
-						socket.removeListener("enemy turn", arguments.callee);
-						done();
-					});
-				});
-				
-				it("相手のターン　～灰色熊召喚");
-				it("自分のターン");
-				
-				/*
-				現状：自分のターンに関するAPIを作った。
-				目標：敵ターン中のAPIを作りたい。
-				TODO 敵ターン中のAPIをサーバ側に仮設置する(battle.js参照)
-				TODO 常に灰色熊を出し、灰色熊で殴ってくるダミー敵を作る。
-				TODO 対戦者がお互い認識出来るようにするには？(DBに対戦中である事を明記する？　それともファイル？)
-				TODO 相手のセッションを覗き見出来るような方法を探る。
-				*/
 			});
 		});
 	</script>
