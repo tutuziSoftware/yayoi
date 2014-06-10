@@ -104,18 +104,26 @@ exports.api = function(session, store){
 			getSession(socket, function(error, session){
 				console.log("attack step - getSession");
 				
+				var escapeAttackerIds = [];
+				
 				attackerIds.forEach(function(attackerId){
 					session.cloneField.i.creatures.every(function(creature){
 						if(creature.id == attackerId){
 							creature.tap = true;
 							creature.isAttack = true;
+							escapeAttackerIds.push(attackerId);
 							return false;
 						}
 					});
 				});
 				
 				socket.emit("attack step");
+				socket.broadcast.emit("block step", escapeAttackerIds);
 			});
+		});
+		
+		socket.on("block step", function(blockerIds){
+			console.log("block step");
 		});
 		
 		socket.on("clone field?", function(){
