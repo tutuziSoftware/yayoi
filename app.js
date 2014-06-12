@@ -43,8 +43,6 @@ app.post('/login', login.routePost);
 
 app.get('/standard_floor', login.checkLogin, require("./standardFloor.js").route);
 app.post('/standard_floor/api', login.checkLogin, require("./standardFloor.js").api);
-app.get('/battle', login.checkLogin, routes.index);
-app.get('/battle/tester', login.checkLogin, routes.index);
 
 app.get('/deck', login.checkLogin, require("./deck.js").route);
 app.post("/deck_save", login.checkLogin, require("./deck.js").routeSave);
@@ -57,5 +55,9 @@ server.listen(app.get('port'), function(){
 
 var io = require('socket.io').listen(server);
 var tester = io.of("/battle/tester");
+
+//練習対戦画面
+app.get('/battle/tester', login.checkLogin, routes.index);
+app.get('/battle', login.checkLogin, routes.index);
 
 tester.on("connection", require("./battleApi.js").api(session, COOKIE.store));
