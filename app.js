@@ -54,10 +54,7 @@ server.listen(app.get('port'), function(){
 });
 
 var io = require('socket.io').listen(server);
-var tester = io.of("/battle/tester");
 
 //練習対戦画面
 app.get('/battle/tester', login.checkLogin, routes.index);
-app.get('/battle', login.checkLogin, routes.index);
-
-tester.on("connection", require("./battleApi.js").api(session, COOKIE.store));
+app.get('/battle/tester/api/id', login.checkLogin, require("./battleApi.js").api.id(io, session, COOKIE.store));

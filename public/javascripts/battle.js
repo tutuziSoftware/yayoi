@@ -9,11 +9,12 @@ function fieldController($scope, $http){
 		"method":"get",
 		"url":"http://localhost:3000/battle/tester/api/id"
 	}).success(function(id){
-		main(id);
+		console.log(id);
+		if(id.result) main(id.value);
 	});
 	
-	function main(id){
-		var socket = io.connect('http://localhost:3000/battle/tester' + id);
+	function main(url){
+		var socket = io.connect(url);
 		
 		/*
 		 * shuffle->

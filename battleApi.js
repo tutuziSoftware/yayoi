@@ -1,4 +1,4 @@
-exports.api = function(session, store){
+var api = function(session, store){
 	return function(socket){
 		console.log("connection");
 	
@@ -163,4 +163,26 @@ exports.api = function(session, store){
 			callback(error, session);
 		});
 	}
+};
+
+exports.api = {};
+
+/**
+ * 対戦前に返るAPIです。
+ * このAPIは「socket.ioのURLを返す」「socket.ioのイベントリスナーを設置する」を行います。
+ */
+exports.api.id = function(io, session, cookieStore){
+	return function(req, res){
+		var url = '/battle/tester/' + require('node-uuid').v4();
+		
+		var tester = io.of(url);
+		tester.on("connection", api(session, cookieStore));
+		
+		//TODO 対人戦の場合、最初にこのAPIを叩いた人はここでURLをDBに記録 + 相手のshuffleからのブロードキャスト待ちになる。
+		
+		res.send({
+			result:true,
+			value:url
+		});
+	};
 };
