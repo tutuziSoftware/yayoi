@@ -180,9 +180,36 @@ exports.api.id = function(io, session, cookieStore){
 		
 		//TODO 対人戦の場合、最初にこのAPIを叩いた人はここでURLをDBに記録 + 相手のshuffleからのブロードキャスト待ちになる。
 		
-		res.send({
+		var result = {
 			result:true,
 			value:url
-		});
+		};
+		
+		res.send(result);
+		
+		return result;
+	};
+};
+
+exports.tester = {
+	api:{}
+};
+exports.tester.api.id = function(io, session, cookieStore){
+	var api = exports.api.id(io, session, cookieStore);
+	
+	return function(req, res){
+		//TODO サーバ側でセッション作成 + socket.ioのURLを開く
+		var result = api(req, res);
+		console.log(result);
+		
+		if(result.result) {
+			//socket.ioをサーバ側で開く
+			var socket = require('socket.io-client')(result.value);
+			socket.on("connect", function(){
+				console.log("tester connect!");
+			});
+			
+			console.log("exports.tester.api.id - result.result = true");
+		}
 	};
 };
