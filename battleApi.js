@@ -198,7 +198,6 @@ exports.tester.api.id = function(io, session, cookieStore){
 	var api = exports.api.id(io, session, cookieStore);
 	
 	return function(req, res){
-		//TODO サーバ側でセッション作成 + socket.ioのURLを開く
 		var result = api(req, res);
 		console.log(result);
 		
@@ -206,7 +205,10 @@ exports.tester.api.id = function(io, session, cookieStore){
 			//socket.ioをサーバ側で開く
 			var socket = require('socket.io-client')(result.value);
 			socket.on("connect", function(){
+				//TODO 何故か呼ばれない
 				console.log("tester connect!");
+				
+				//TODO サーバ側にセッションの代替となるデータ置き場を作る
 			});
 			
 			console.log("exports.tester.api.id - result.result = true");
