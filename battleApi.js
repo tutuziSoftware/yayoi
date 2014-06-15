@@ -187,6 +187,7 @@ exports.api.id = function(io, session, cookieStore){
 		
 		res.send(result);
 		
+		result.tester = tester;
 		return result;
 	};
 };
