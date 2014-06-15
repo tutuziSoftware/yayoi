@@ -178,7 +178,7 @@ exports.api.id = function(io, session, cookieStore){
 		var tester = io.of(url);
 		tester.on("connection", api(session, cookieStore));
 		
-		//TODO 対人戦の場合、最初にこのAPIを叩いた人はここでURLをDBに記録 + 相手のshuffleからのブロードキャスト待ちになる。
+		//TODO 対人戦の場合、最初にこのAPIを叩いた人はここで相手shuffleからのブロードキャスト待ちになる。
 		
 		var result = {
 			result:true,
@@ -200,19 +200,23 @@ exports.tester.api.id = function(io, session, cookieStore){
 	
 	return function(req, res){
 		var result = api(req, res);
-		console.log(result);
+		console.log('http://localhost:3000'+result.value);
 		
-		if(result.result) {
-			//socket.ioをサーバ側で開く
-			var socket = require('./node_modules/socket.io/node_modules/socket.io-client')(result.value);
-			socket.on("connect", function(){
-				//TODO 何故か呼ばれない
-				console.log("tester connect!");
-				
-				//TODO サーバ側にセッションの代替となるデータ置き場を作る
-			});
+		result.tester.on("connection", function(){
+			if(result.result) {
+				//socket.ioをサーバ側で開く
+				var socket = require('./node_modules/socket.io/node_modules/socket.io-client')('http://localhost:3000'+result.value);
+				socket.on("connect", function(){
+					console.log("tester connect!");
+					
+					//TODO getSession時にsplitメソッドがないと言われる
+					//socket.emit("shuffle");
+					
+					//TODO サーバ側にセッションの代替となるデータ置き場を作る
+				});
 			
-			console.log("exports.tester.api.id - result.result = true");
-		}
+				console.log("exports.tester.api.id - result.result = true");
+			}
+		});
 	};
 };
