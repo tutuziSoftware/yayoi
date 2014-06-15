@@ -8,7 +8,10 @@ var api = function(session, store){
 			getSession(socket, function(error, session){
 				console.log("shuffle - getSession");
 				
-				if(error) {
+				if(error === "cookie not found"){
+					console.log("shuffle - 偽session");
+					session = getSession.session = {};
+				}else if(error) {
 					console.log("shuffle - error");
 					return;
 				}
@@ -151,6 +154,12 @@ var api = function(session, store){
 			return;
 		}
 		
+		//クライアント側にクッキーが存在しない場合はエラー
+		if(socket.request.headers.cookie === void 0){
+			callback("cookie not found", null);
+			return;
+		}
+		
 		var cookie = require('cookie').parse(socket.request.headers.cookie);
 		var memoryStore = new session.MemoryStore;
 	
@@ -210,7 +219,7 @@ exports.tester.api.id = function(io, session, cookieStore){
 					console.log("tester connect!");
 					
 					//TODO getSession時にsplitメソッドがないと言われる
-					//socket.emit("shuffle");
+					socket.emit("shuffle");
 					
 					//TODO サーバ側にセッションの代替となるデータ置き場を作る
 				});
