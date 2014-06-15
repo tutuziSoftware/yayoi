@@ -204,7 +204,7 @@ exports.tester.api.id = function(io, session, cookieStore){
 		
 		if(result.result) {
 			//socket.ioをサーバ側で開く
-			var socket = require('socket.io-client')(result.value);
+			var socket = require('./node_modules/socket.io/node_modules/socket.io-client')(result.value);
 			socket.on("connect", function(){
 				//TODO 何故か呼ばれない
 				console.log("tester connect!");
