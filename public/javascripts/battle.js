@@ -274,8 +274,12 @@ function fieldController($scope, $http){
 		$scope.turnEnd = function(){
 			var creatures = $scope.field.i.creatures.filter(function(creature){
 				return creature.isAttack;
+			}).map(function(creature){
+				return creature.id;
 			});
-		
+			
+			console.log(creatures);
+			
 			socket.emit("attack step", creatures);
 		};
 	

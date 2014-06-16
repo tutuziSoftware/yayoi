@@ -36,6 +36,7 @@ var api = function(session, store){
 					},
 					//相手の情報
 					"enemy":{
+						"life":20,
 						"creatures":[],
 						"enchantFields":[]
 					}
@@ -121,7 +122,9 @@ var api = function(session, store){
 				
 				console.log(ATTACK_STEP_API + " - emit");
 				socket.emit("attack step");
-				console.log("block step - broadcast.emit");
+				console.log("socket.broadcast.emit");
+				console.log(attackerIds);
+				console.log(escapeAttackerIds);
 				socket.broadcast.emit("block step", escapeAttackerIds);
 			});
 		});
@@ -153,20 +156,20 @@ var api = function(session, store){
 			callback(null, getSession.session);
 			return;
 		}
-		
+	
 		//クライアント側にクッキーが存在しない場合はエラー
 		if(socket.request.headers.cookie === void 0){
 			callback("cookie not found", null);
 			return;
 		}
-		
+	
 		var cookie = require('cookie').parse(socket.request.headers.cookie);
 		var memoryStore = new session.MemoryStore;
-	
+
 		if(typeof cookie['connect.sid'] != "string"){
 			callback(true, null);
 		}
-	
+
 		store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], function(error, session){
 			getSession.session = session;
 			callback(error, session);
@@ -214,18 +217,38 @@ exports.tester.api.id = function(io, session, cookieStore){
 		result.tester.on("connection", function(){
 			if(result.result) {
 				//socket.ioをサーバ側で開く
-				var socket = require('./node_modules/socket.io/node_modules/socket.io-client')('http://localhost:3000'+result.value);
+				var socket = require('./node_modules/socket.io/node_modules/socket.io-client')('http://localhost:3000'+result.value, {
+					'force new connection':true
+				});
 				socket.on("connect", function(){
 					console.log("tester connect!");
-					
-					//TODO getSession時にsplitメソッドがないと言われる
-					socket.emit("shuffle");
-					
-					//TODO サーバ側にセッションの代替となるデータ置き場を作る
+					robot(socket);
 				});
-			
+				
 				console.log("exports.tester.api.id - result.result = true");
 			}
 		});
 	};
 };
+
+function robot(socket){
+	socket.emit("shuffle");
+	
+	socket.on("block step", function(attackerIds){
+		console.log("tester block step");
+		
+		getSession(socket, function(error, session){
+			var attackers = session.cloneField.enemy.creatures.filter(function(creature){
+				for(var i = 0 ; i != attackerIds.length ; i++){
+					if(attackerIds.id == creature.id){
+						return creature;
+					}
+				}
+			});
+			
+			console.log("robot - block step");
+			console.log(session.enemy.creatures);
+			console.log(attackers);
+		});
+	});
+}
