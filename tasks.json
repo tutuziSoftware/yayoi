@@ -1,6 +1,7 @@
 /*
 
 次回予告
+TODO 練習者のblock step時に、スコープ外のgetSessionを使用している為、getSessionを移動させる
 TODO テスト戦闘画面をいじってattack stepとblock stepの動作を実装する
 TODO 敵ターン中のAPIをサーバ側に仮設置する(battle.js参照)
 TODO 常に灰色熊を出し、灰色熊で殴ってくるダミー敵を作る。

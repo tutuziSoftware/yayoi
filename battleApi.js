@@ -5,7 +5,7 @@ var api = function(session, store){
 		socket.on("shuffle", function(data){
 			console.log("shuffle");
 			
-			getSession(socket, function(error, session){
+			getSession(socket, store, function(error, session){
 				console.log("shuffle - getSession");
 				
 				if(error === "cookie not found"){
@@ -64,7 +64,7 @@ var api = function(session, store){
 			console.log("hand to mana:" + cardId);
 			console.log("getSession.session = " + getSession.session);
 			
-			getSession(socket, function(error, session){
+			getSession(socket, store, function(error, session){
 				console.log("hand to mana - getSession");
 				
 				session.cloneField.i.hands.every(function(hand, i){
@@ -81,7 +81,7 @@ var api = function(session, store){
 			console.log("play");
 			var engine = require("./public/javascripts/battle_engine.js");
 			
-			getSession(socket, function(error, session){
+			getSession(socket, store, function(error, session){
 				session.cloneField.i.hands.every(function(hand, i){
 					if(cardId == hand.id){
 						console.log("play - hand");
@@ -106,7 +106,7 @@ var api = function(session, store){
 		socket.on(ATTACK_STEP_API, function(attackerIds){
 			console.log(ATTACK_STEP_API);
 			
-			getSession(socket, function(error, session){
+			getSession(socket, store, function(error, session){
 				var escapeAttackerIds = [];
 				
 				attackerIds.forEach(function(attackerId){
@@ -134,7 +134,7 @@ var api = function(session, store){
 		});
 		
 		socket.on("clone field?", function(){
-			getSession(socket, function(error, session){
+			getSession(socket, store, function(error, session){
 				console.log("clone field!");
 				console.log(session);
 				var cloneField = "cloneField" in session ? session.cloneField : null;
@@ -142,39 +142,6 @@ var api = function(session, store){
 			});
 		});
 	};
-	
-	/**
-	 * セッションを取得します。
-	 * 
-	 * @param  socket	socket.ioがconnection時に出力する第一引数
-	 * @param function(error, session) callback
-	 */
-	function getSession(socket, callback){
-		if(getSession.session !== void 0){
-			console.log("getSession.session");
-			console.log(getSession.session);
-			callback(null, getSession.session);
-			return;
-		}
-	
-		//クライアント側にクッキーが存在しない場合はエラー
-		if(socket.request.headers.cookie === void 0){
-			callback("cookie not found", null);
-			return;
-		}
-	
-		var cookie = require('cookie').parse(socket.request.headers.cookie);
-		var memoryStore = new session.MemoryStore;
-
-		if(typeof cookie['connect.sid'] != "string"){
-			callback(true, null);
-		}
-
-		store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], function(error, session){
-			getSession.session = session;
-			callback(error, session);
-		});
-	}
 };
 
 exports.api = {};
@@ -237,7 +204,7 @@ function robot(socket){
 	socket.on("block step", function(attackerIds){
 		console.log("tester block step");
 		
-		getSession(socket, function(error, session){
+		getSession(socket, null, function(error, session){
 			var attackers = session.cloneField.enemy.creatures.filter(function(creature){
 				for(var i = 0 ; i != attackerIds.length ; i++){
 					if(attackerIds.id == creature.id){
@@ -250,5 +217,30 @@ function robot(socket){
 			console.log(session.enemy.creatures);
 			console.log(attackers);
 		});
+	});
+}
+
+/**
+ * セッションを取得します。
+ * 
+ * @param  socket	socket.ioがconnection時に出力する第一引数
+ * @param function(error, session) callback
+ */
+function getSession(socket, store, callback){
+	//クライアント側にクッキーが存在しない場合はエラー
+	if(socket.request.headers.cookie === void 0){
+		callback("cookie not found", null);
+		return;
+	}
+	
+	var cookie = require('cookie').parse(socket.request.headers.cookie);
+	
+	if(typeof cookie['connect.sid'] != "string"){
+		callback(true, null);
+	}
+
+	store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], function(error, session){
+		getSession.session = session;
+		callback(error, session);
 	});
 }
