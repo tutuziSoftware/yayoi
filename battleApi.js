@@ -240,7 +240,6 @@ function getSession(socket, store, callback){
 	}
 
 	store.get(cookie['connect.sid'].match(/s:([^.]*)\./)[1], function(error, session){
-		getSession.session = session;
 		callback(error, session);
 		store.set(cookie['connect.sid'].match(/s:([^.]*)\./)[1], session);
 	});
