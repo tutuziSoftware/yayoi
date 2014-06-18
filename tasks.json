@@ -1,7 +1,12 @@
 /*
-
 次回予告
-TODO 練習者のblock step時に、スコープ外のgetSessionを使用している為、getSessionを移動させる
+now:セッション同士をsocket.ioで通信してデータをやりとりするのは複雑すぎる
+new:DBを使って戦闘を行うようにしたい
+
+TODO 戦闘用スキーマの作成
+TODO 戦闘の整合性を保つModelの作成
+TODO 戦闘ID(自分用、相手用)をセッションに持つようにする
+TODO 戦闘IDを元に戦闘Modelがデータを適切に渡すようにする
 TODO テスト戦闘画面をいじってattack stepとblock stepの動作を実装する
 TODO 敵ターン中のAPIをサーバ側に仮設置する(battle.js参照)
 TODO 常に灰色熊を出し、灰色熊で殴ってくるダミー敵を作る。
