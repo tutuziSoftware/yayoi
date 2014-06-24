@@ -41,5 +41,33 @@ module.exports.prototype = {
 			'status':'wait_standard',
 			'_id':{$ne:this.session.userId}
 		},'_id status userName', callback);
+	},
+	/**
+	 * スタンダード対戦を開始します。
+	 */
+	startStandardBattle:function(enemyId, callback){
+		var ObjectId = require('mongoose').Types.ObjectId;
+		
+		var db = require('./userDB.js').db;
+		var that = this;
+		
+		db.findOne({
+			'status':'wait_standard',
+			'_id':new ObjectId(enemyId)
+		}, function(error, enemy){
+			if(enemy){
+				[that.session.userId, enemy._id].forEach(function(_id){
+					db.update({
+						'_id':_id
+					},{
+						'status':'battle'
+					},{multi:true},function(err){
+						console.log(err);
+					});
+				});
+			}else{
+				if(callback) callback('error!');
+			}
+		});
 	}
 };
