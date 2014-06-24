@@ -42,7 +42,6 @@ app.get('/login', login.checkLogin, login.route);
 app.post('/login', login.routePost);
 
 app.get('/standard_floor', login.checkLogin, require("./standardFloor.js").route);
-app.post('/standard_floor/api', login.checkLogin, require("./standardFloor.js").api);
 
 app.get('/deck', login.checkLogin, require("./deck.js").route);
 app.post("/deck_save", login.checkLogin, require("./deck.js").routeSave);
@@ -57,6 +56,9 @@ var io = require('socket.io').listen(server);
 
 
 app.get('/battle/api/id', login.checkLogin, require("./battleApi.js").api.id(io, session, COOKIE.store));
+
+//フロア画面
+require('./standardFloor.js').api(io, COOKIE.store);
 
 //練習対戦画面
 app.get('/battle/tester', login.checkLogin, routes.index);

@@ -1,10 +1,13 @@
 function controller($scope, $http){
 	$scope.players = [];
-	$http({
-		"method":"post",
-		"url":"http://localhost:3000/standard_floor/api"
-	}).success(function(players){
-		console.log(players);
-		$scope.players = players;
+	
+	var socket = io.connect("ws://localhost:3000/standard_floor");
+	socket.on("connect", function(){
+		socket.on("players", function(users){
+			console.log('players');
+			console.log(users);
+			$scope.players = users;
+			$scope.$apply();
+		});
 	});
 }

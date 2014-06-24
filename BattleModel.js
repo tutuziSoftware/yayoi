@@ -1,5 +1,4 @@
 var battleDB = require('./db')('battle', {
-	'id':String,
 	'enemyId':String,
 	'life':{type:Number, default:20},
 	'mana':{type:Number, default:0},
@@ -17,10 +16,15 @@ exports.BattleModel = function(id){
 	this.id = id;
 };
 
+exports.start = function(callback){
+	var cloneField = new battleDB({});
+	cloneField.save(callback);
+}
+
 /**
  * @param callback(error, cloneField) コンストラクタのIDを元に、クローンフィールドに関する情報を出力します。
  */
-exports.find = function(callback){
+exports.update = function(callback){
 	var that = this;
 	
 	battleDB.findOne({
@@ -38,4 +42,6 @@ exports.find = function(callback){
 	});
 };
 
-exports.save = function(){};
+exports.save = function(){
+	battleDb.save(this.cloneField);
+};
