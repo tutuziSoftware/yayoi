@@ -3,6 +3,16 @@ module.exports = function(session){
 };
 
 module.exports.prototype = {
+	initLoggadIn:function(){
+		var db = require("./userDB.js").db;
+		
+		db.update({
+			"_id":this.session.userId
+		},{
+			"status":""
+		},{multi:false},function(err){
+		});
+	},
 	/**
 	 * プレイヤーをスタンダード対戦一覧に追加します。
 	 */

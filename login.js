@@ -31,6 +31,10 @@ exports.routePost = function(req, res){
 	userDB.findUser(key.userName, key.password, function(user){
 		if(user.length){
 			req.session.userId = user[0]._id;
+			
+			var model = new (require('./userModel.js'))(req.session);
+			model.initLoggadIn();
+			
 			res.redirect("/");
 		}else{
 			res.redirect("/login");
