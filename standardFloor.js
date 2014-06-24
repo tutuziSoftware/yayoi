@@ -1,10 +1,6 @@
+var Model = require("./userModel.js");
+
 exports.route = function(req, res){
-	var model = require("./userModel.js");
-	model = new model(req.session);
-	
-	console.log(model);
-	
-	model.startEntryStandard();
 	res.render("standardFloor");
 };
 
@@ -18,15 +14,10 @@ exports.api = function(io, sessionStore){
 		require('./getSession.js')(socket, sessionStore, function(error, session){
 			if(session == void 0) return;
 			
-			var where = {_id:session.userId};
-			var update = {$set:{status:'wait_standard'}};
-			
-			userDB.update(where, update, {multi:true}, function(){
-				userDB.find({
-					"status":"wait_standard",
-					"_id":{$ne:session.userId}
-				}, function(err, data){
-					socket.emit("players", data);
+			var model = new Model(session);
+			model.startEntryStandard(function(err, data){
+				model.findFloorUser(function(error, players){
+					socket.emit("players", players);
 				});
 			});
 		});
@@ -41,10 +32,7 @@ exports.api = function(io, sessionStore){
 			require('./getSession.js')(socket, sessionStore, function(error, session){
 				if(session == void 0) return;
 				
-				var where = {_id:session.userId};
-				var update = {$set:{status:''}};
-				
-				userDB.update(where, update, {multi:true}, function(){});
+				new Model(session).endEntryStandard();
 			});
 		});
 	});
