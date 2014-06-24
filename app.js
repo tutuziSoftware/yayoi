@@ -46,6 +46,9 @@ app.get('/standard_floor', login.checkLogin, require("./standardFloor.js").route
 app.get('/deck', login.checkLogin, require("./deck.js").route);
 app.post("/deck_save", login.checkLogin, require("./deck.js").routeSave);
 
+app.get('/battle', login.checkLogin, routes.index);
+app.get('/battle/start', login.checkLogin, require('./battleStart.js'));
+
 var server = http.createServer(app);
 
 server.listen(app.get('port'), function(){

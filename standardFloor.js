@@ -16,7 +16,6 @@ exports.api = function(io, sessionStore){
 		
 		//コネクション確立時は待ちフラグ
 		require('./getSession.js')(socket, sessionStore, function(error, session){
-			console.log("123");
 			if(session == void 0) return;
 			
 			var where = {_id:session.userId};
@@ -30,6 +29,11 @@ exports.api = function(io, sessionStore){
 					socket.emit("players", data);
 				});
 			});
+		});
+		
+		//対戦開始
+		socket.on("start", function(){
+			console.log("start");
 		});
 		
 		//コネクションが切れた場合は待ちフラグ解除
