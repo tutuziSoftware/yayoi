@@ -1,11 +1,9 @@
 /*
 次回予告
 
-TODO 戦闘画面までの流れを作る
-TODO 戦闘用スキーマの作成
-TODO 戦闘の整合性を保つModelの作成
-TODO 戦闘ID(自分用、相手用)をセッションに持つようにする
-TODO 戦闘IDを元に戦闘Modelがデータを適切に渡すようにする
+TODO クローンフィールドの生成(戦闘用Modelを作る)
+TODO 戦闘開始を相手に通知(socket.io？)
+
 TODO テスト戦闘画面をいじってattack stepとblock stepの動作を実装する
 TODO 敵ターン中のAPIをサーバ側に仮設置する(battle.js参照)
 TODO 常に灰色熊を出し、灰色熊で殴ってくるダミー敵を作る。
