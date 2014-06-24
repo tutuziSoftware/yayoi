@@ -17,7 +17,6 @@ exports.api = function(io, sessionStore){
 		userDB.find({
 			"status":"wait_standard"
 		}, function(err, data){
-			console.log(data);
 			socket.emit("players", data);
 		});
 		
@@ -25,9 +24,12 @@ exports.api = function(io, sessionStore){
 			//TODO ここでDBのstatusを変更する
 			//どうやって？　セッションに_id保存してたはずでは。
 			//どうやってセッションを探すの？　ああ…。
-			console.log(sessionStore);
-			
-			console.log("disconnect");
+			require('./getSession.js')(socket, sessionStore, function(error, session){
+				var where = {_id:session.userId};
+				var update = {$set:{status:''}};
+				
+				userDB.update(where, update, {multi:true}, function(){});
+			});
 		});
 	});
 	
