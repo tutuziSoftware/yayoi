@@ -14,17 +14,29 @@ exports.api = function(io, sessionStore){
 	api.on("connection", function(socket){
 		var userDB = require("./userDB.js").db;
 		
-		userDB.find({
-			"status":"wait_standard"
-		}, function(err, data){
-			socket.emit("players", data);
+		//コネクション確立時は待ちフラグ
+		require('./getSession.js')(socket, sessionStore, function(error, session){
+			console.log("123");
+			if(session == void 0) return;
+			
+			var where = {_id:session.userId};
+			var update = {$set:{status:'wait_standard'}};
+			
+			userDB.update(where, update, {multi:true}, function(){
+				userDB.find({
+					"status":"wait_standard",
+					"_id":{$ne:session.userId}
+				}, function(err, data){
+					socket.emit("players", data);
+				});
+			});
 		});
 		
+		//コネクションが切れた場合は待ちフラグ解除
 		socket.on("disconnect", function(){
-			//TODO ここでDBのstatusを変更する
-			//どうやって？　セッションに_id保存してたはずでは。
-			//どうやってセッションを探すの？　ああ…。
 			require('./getSession.js')(socket, sessionStore, function(error, session){
+				if(session == void 0) return;
+				
 				var where = {_id:session.userId};
 				var update = {$set:{status:''}};
 				
