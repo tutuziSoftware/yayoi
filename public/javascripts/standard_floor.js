@@ -14,4 +14,8 @@ function controller($scope, $http){
 			console.log('start');
 		});
 	});
+	
+	$scope.start = function(){
+		socket.emit('start');
+	};
 }

@@ -5,6 +5,13 @@ exports.route = function(req, res){
 };
 
 exports.api = function(io, sessionStore){
+	floor(io, sessionStore);
+};
+
+/**
+ * フロア画面に入った時、出た時の待ち合わせAPIです。
+ */
+function floor(io, sessionStore){
 	var api = io.of('/standard_floor');
 	
 	api.on("connection", function(socket){
@@ -17,15 +24,10 @@ exports.api = function(io, sessionStore){
 			var model = new Model(session);
 			model.startEntryStandard(function(err, data){
 				model.findFloorUser(function(error, players){
+					//自分が見たい対戦相手一覧
 					socket.emit("players", players);
 				});
 			});
-		});
-		
-		//対戦開始
-		socket.on("start", function(){
-			console.log("start");
-			socket.emit('start');
 		});
 		
 		//コネクションが切れた場合は待ちフラグ解除
@@ -37,14 +39,4 @@ exports.api = function(io, sessionStore){
 			});
 		});
 	});
-	
-	/*
-	var userDB = require("./userDB.js").db;
-	
-	userDB.find({
-		"status":"wait_standard"
-	}, function(err, data){
-		console.log(data);
-	});
-	*/
-};
+}
