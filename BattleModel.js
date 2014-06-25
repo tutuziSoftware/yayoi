@@ -23,30 +23,32 @@ exports.BattleModel.prototype.start = function(enemyId, callback){
 	
 	battleDB.remove({
 		'userId':that.id
+	}, function(){
+		battleDB.remove({
+			'userId':enemyId
+		}, function(){
+			var urlToken = require('node-uuid').v4();
+			console.log('userId:'+that.id);
+			console.log('userId:'+enemyId);
+			console.log('urlToken:'+urlToken);
+	
+			//自分のクローンフィールド
+			new battleDB({
+				'userId':that.id,
+				'enemyId':enemyId,
+				'urlToken':urlToken
+			}).save(function(){
+				//相手のクローンフィールド
+				new battleDB({
+					'userId':enemyId,
+					'enemyId':that.id,
+					'urlToken':urlToken
+				}).save(function(){
+					callback();
+				});
+			});
+		});
 	});
-	
-	battleDB.remove({
-		'userId':enemyId
-	});
-	
-	var urlToken = require('node-uuid').v4();
-	console.log('userId:'+that.id);
-	console.log('userId:'+enemyId);
-	console.log('urlToken:'+urlToken);
-	
-	//自分のクローンフィールド
-	new battleDB({
-		'userId':that.id,
-		'enemyId':enemyId,
-		'urlToken':urlToken
-	}).save(function(){});
-
-	//相手のクローンフィールド
-	new battleDB({
-		'userId':enemyId,
-		'enemyId':that.id,
-		'urlToken':urlToken
-	}).save(function(){});
 }
 
 /**
