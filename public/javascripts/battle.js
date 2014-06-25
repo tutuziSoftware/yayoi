@@ -46,9 +46,11 @@ function fieldController($scope, $http){
 				$scope.$apply();
 			});
 			
-			socket.on('enemy hand to mana', function(enemyField){
+			socket.on('enemy', function(enemyField){
 				console.log('enemy hand to mana');
 				console.log(enemyField);
+				$scope.enemyField = enemyField;
+				$scope.$apply();
 			});
 		});
 	
@@ -63,7 +65,7 @@ function fieldController($scope, $http){
 	
 		//敵を含むすべての場のルート
 		field = $scope.field = {
-			"life":10,
+			"life":20,
 			"mana":0,
 			"creatures":[],
 			"enchantFields":[],
@@ -93,6 +95,18 @@ function fieldController($scope, $http){
 				}, this);
 			}
 		};
+		
+		$scope.enemyField = {
+			"life":20,
+			"mana":0,
+			"creatures":[],
+			"enchantFields":[],
+			"upkeeps":[],
+			"deck":[
+				{},{},{}
+			],
+			"hands":[]
+		}
 		
 		/**
 		 * カードを手札から捨て、マナに変換します。

@@ -32,39 +32,39 @@ var api = function(session, store){
 		
 		socket.on("hand to mana", function(cardId){
 			battleModel.update(function(error, cloneField){
-				console.log("hand to mana - getSession");
-				
 				cloneField.hands.every(function(hand, i){
-					console.log(hand.id);
 					if(cardId == hand.id){
-						console.log('add mana');
 						cloneField.mana++;
 						cloneField.hands.splice(i, 1);
 						return false;
 					}
 				});
 				
-				socket.broadcast.emit('enemy hand to mana', battleModel.toEnemy());
+				battleModel.save(function(){
+					socket.broadcast.emit('enemy', battleModel.toEnemy());
+				});
 			});
 		});
 		
 		socket.on("play", function(cardId){
-			console.log("play");
 			var engine = require("./public/javascripts/battle_engine.js");
 			
 			battleModel.update(function(error, cloneField){
 				cloneField.hands.every(function(hand, i){
 					if(cardId == hand.id){
-						console.log("play - hand");
-						console.log(hand);
-						
 						cloneField.card = hand;
 						
 						engine.doEnterBattlefield.call(cloneField, {
 							field: cloneField
 						});
+						
+						battleModel.save(function(){
+							socket.broadcast.emit('enemy', battleModel.toEnemy());
+						});
 						return false;
 					}
+					
+					return true;
 				});
 			});
 		});

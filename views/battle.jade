@@ -11,14 +11,13 @@ block content
 		div(ng-if="isBlockStep")
 			button(ng-click="doBlockStep()") ブロック判定開始
 		div
-			div 敵のカード
-			ul
-				li(ng-repeat="card in field.enemy.creatures")
-					div
-						div {{card.name}} ({{card.power}}/{{card.toughness}}, id:{{card.id}})
+			div 相手の情報
+				div ライフ：{{enemyField.life}}
+				div マナ：{{enemyField.mana}}
+				ul
+					li(ng-repeat="card in enemyField.creatures")
 						div
-							button(ng-if="castCard && castCard.canTarget(card)" ng-click="doTargetSelected()") 対象にする
-							button(ng-if="isBlockStep" ng-click="selectAttacker(card)") ブロックする
+							div {{card.name}} ({{card.power}}/{{card.toughness}}, id:{{card.id}})
 		div
 			div 場に出した自分のカード
 			ul
