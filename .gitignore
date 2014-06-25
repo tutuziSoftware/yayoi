@@ -3,3 +3,4 @@ node_modules/
 public/unittest/lib/jasmine-2.0.0/
 public/unittest/MIT.LICENSE
 *.swp
+*.sh
