@@ -152,22 +152,25 @@ exports.api = {};
  */
 exports.api.id = function(io, session, cookieStore){
 	return function(req, res){
-		var url = '/battle/tester/' + require('node-uuid').v4();
+		var Model = require('./BattleModel.js').BattleModel;
+		var model = new Model(req.session.userId);
 		
-		var tester = io.of(url);
-		tester.on("connection", api(session, cookieStore));
+		model.update(function(error, cloneField){
+			console.log(cloneField);
+			var url = '/battle/' + cloneField.urlToken;
 		
-		//TODO 対人戦の場合、最初にこのAPIを叩いた人はここで相手shuffleからのブロードキャスト待ちになる。
+			var tester = io.of(url);
+			tester.on("connection", api(session, cookieStore));
 		
-		var result = {
-			result:true,
-			value:url
-		};
+			//TODO 対人戦の場合、最初にこのAPIを叩いた人はここで相手shuffleからのブロードキャスト待ちになる。
 		
-		res.send(result);
+			var result = {
+				result:true,
+				value:url
+			};
 		
-		result.tester = tester;
-		return result;
+			res.send(result);
+		});
 	};
 };
 

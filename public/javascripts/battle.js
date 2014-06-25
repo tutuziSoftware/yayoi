@@ -7,7 +7,7 @@ var field;
 function fieldController($scope, $http){
 	$http({
 		"method":"get",
-		"url":"http://localhost:3000/battle/tester/api/id"
+		"url":"http://localhost:3000/battle/api/id"
 	}).success(function(id){
 		console.log(id);
 		if(id.result) main(id.value);
