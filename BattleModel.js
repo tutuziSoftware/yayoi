@@ -74,8 +74,10 @@ exports.BattleModel.prototype.update = function(callback){
 	});
 };
 
-exports.BattleModel.prototype.save = function(){
-	battleDb.save(this.cloneField);
+exports.BattleModel.prototype.save = function(callback){
+	new battleDB(this.cloneField).save(function(error){
+		callback(error);
+	});
 };
 
 /**

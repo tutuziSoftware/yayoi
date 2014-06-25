@@ -23,16 +23,19 @@ var api = function(session, store){
 						});
 					}
 					
-					socket.emit("first draw", cloneField);
+					battleModel.save(function(){
+						socket.emit("first draw", cloneField);
+					});
 				});
 			});
 		});
 		
 		socket.on("hand to mana", function(cardId){
 			battleModel.update(function(error, cloneField){
-				//console.log("hand to mana - getSession");
+				console.log("hand to mana - getSession");
 				
 				cloneField.hands.every(function(hand, i){
+					console.log(hand.id);
 					if(cardId == hand.id){
 						console.log('add mana');
 						cloneField.mana++;
