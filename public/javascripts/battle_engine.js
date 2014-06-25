@@ -29,11 +29,11 @@ battle.doEnterBattlefield = function($scope){
 	
 	//マナコストの支払い
 	if(doManaCost($scope, this)){
-		if(this.card.cardType == "creature") $scope.field.i.creatures.push(this.card);
-		if(this.card.cardType == "enchantField") $scope.field.i.enchantFields.push(this.card);
+		if(this.card.cardType == "creature") $scope.field.creatures.push(this.card);
+		if(this.card.cardType == "enchantField") $scope.field.enchantFields.push(this.card);
 		
 		if(this.card.doEnterBattlefield) this.card.doEnterBattlefield($scope.field);
-		if(this.card.doUpkeep) $scope.field.i.upkeeps.push(this.card);
+		if(this.card.doUpkeep) $scope.field.upkeeps.push(this.card);
 	}
 	
 	//クライアントサイドのみ。カードを唱えた事をクローンフィールドへ伝える。
@@ -45,9 +45,9 @@ battle.doEnterBattlefield = function($scope){
  */
 function doManaCost($scope, that){
 	//マナコストの支払い
-	if($scope.field.i.mana >= that.card.manaCost){
-		$scope.field.i.mana -= that.card.manaCost;
-		$scope.field.i.hands.splice(that.$index, 1);
+	if($scope.field.mana >= that.card.manaCost){
+		$scope.field.mana -= that.card.manaCost;
+		$scope.field.hands.splice(that.$index, 1);
 		return true;
 	}
 	

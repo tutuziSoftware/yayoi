@@ -63,23 +63,15 @@ function fieldController($scope, $http){
 	
 		//敵を含むすべての場のルート
 		field = $scope.field = {
-			//自分の情報		
-			"i":{
-				"life":10,
-				"mana":0,
-				"creatures":[],
-				"enchantFields":[],
-				"upkeeps":[],
-				"deck":[
-					{},{},{}
-				],
-				"hands":[]
-			},
-			//相手の情報
-			"enemy":{
-				"creatures":[],
-				"enchantFields":[]
-			},
+			"life":10,
+			"mana":0,
+			"creatures":[],
+			"enchantFields":[],
+			"upkeeps":[],
+			"deck":[
+				{},{},{}
+			],
+			"hands":[],
 			/**
 			 * 場と手札にあるカードをIDで探索出来るよう再構築します。
 			 */
@@ -101,19 +93,7 @@ function fieldController($scope, $http){
 				}, this);
 			}
 		};
-	
-		//テスト用
-		(function(){
-			var id = 0;
-			var addID = function(card){
-				card.id = id;
-				id++;
-			}
 		
-			$scope.field.i.hands.forEach(addID);
-			$scope.field.enemy.creatures.forEach(addID);
-		})();
-	
 		/**
 		 * カードを手札から捨て、マナに変換します。
 		 */
@@ -121,11 +101,11 @@ function fieldController($scope, $http){
 			if(this.card.doManaCostDiscard){
 				this.card.doManaCostDiscard($scope.field);
 			}else{
-				$scope.field.i.mana++;
+				$scope.field.mana++;
 			}
 
-			$scope.field.i.hands.splice(this.$index, 1);
-		
+			$scope.field.hands.splice(this.$index, 1);
+			
 			socket.emit("hand to mana", this.card.id);
 		};
 
@@ -254,18 +234,18 @@ function fieldController($scope, $http){
 		//テスト用？
 		$scope.turnStart = function(){
 			//アンタップステップ
-			$scope.field.i.creatures.forEach(function(creature){
+			$scope.field.creatures.forEach(function(creature){
 				creature.tap = false;
 			});
-			$scope.field.i.enchantFields.forEach(function(enchantField){
+			$scope.field.enchantFields.forEach(function(enchantField){
 				enchantField.tap = false;
 			});
 		
 			//ドローステップ
-			field.i.hands.push(field.i.deck.shift());
+			field.hands.push(field.i.deck.shift());
 		
 			//アップキープステップ
-			field.i.upkeeps.forEach(function(card){
+			field.upkeeps.forEach(function(card){
 				card.doUpkeep($scope.field);
 			});
 		
@@ -277,7 +257,7 @@ function fieldController($scope, $http){
 		 * 自分のターンを終了します
 		 */
 		$scope.turnEnd = function(){
-			var creatures = $scope.field.i.creatures.filter(function(creature){
+			var creatures = $scope.field.creatures.filter(function(creature){
 				return creature.isAttack;
 			}).map(function(creature){
 				return creature.id;
@@ -289,7 +269,7 @@ function fieldController($scope, $http){
 		};
 	
 		$scope.testEnemyAttack = function(){
-			$scope.field.enemy.creatures[0].isAttack = true;
+			$scope.field.creatures[0].isAttack = true;
 		};
 	
 		/**
@@ -297,9 +277,9 @@ function fieldController($scope, $http){
 		 */
 		function doManaCost(that){
 			//マナコストの支払い
-			if($scope.field.i.mana >= that.card.manaCost){
-				$scope.field.i.mana -= that.card.manaCost;
-				$scope.field.i.hands.splice(that.$index, 1);
+			if($scope.field.mana >= that.card.manaCost){
+				$scope.field.mana -= that.card.manaCost;
+				$scope.field.hands.splice(that.$index, 1);
 				return true;
 			}
 		

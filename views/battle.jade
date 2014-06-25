@@ -22,7 +22,7 @@ block content
 		div
 			div 場に出した自分のカード
 			ul
-				li(ng-repeat="card in field.i.creatures")
+				li(ng-repeat="card in field.creatures")
 					div
 						div {{card.name}} ({{card.power}}/{{card.toughness}}, id:{{card.id}})
 						div
@@ -31,20 +31,20 @@ block content
 							button(ng-click="doAttack()" ng-hide="card.isAttack") 攻撃する
 							button(ng-click="doAttack()" ng-show="card.isAttack") 攻撃しない
 							button(ng-if="isBlockStep" ng-click="selectBlocker(card)") ブロックを行う
-				li(ng-repeat="card in field.i.enchantFields")
+				li(ng-repeat="card in field.enchantFields")
 					div
 						div {{card.name}} 
 						div
 							button(ng-click="doTap()" ng-disabled="card.tap") タップする
-		div ライフ：{{field.i.life}}
-		div マナ：{{field.i.mana}}
+		div ライフ：{{field.life}}
+		div マナ：{{field.mana}}
 		ul
-			li(ng-repeat="card in field.i.hands")
+			li(ng-repeat="card in field.hands")
 				div {{card.name}}({{card.manaCost}}
 					span(ng-if="card.creatureType") , {{card.power}}/{{card.toughness}}, id:{{card.id}})
 					span(ng-if="!card.creatureType") , id:{{card.id}})
 				div {{card.flavorText}}
 				div
-					button(ng-click="doEnterBattlefield()" ng-if="card.cardType == 'creature' || card.cardType == 'enchantField'" ng-disabled="field.i.mana < card.manaCost") 場に出す
-					button(ng-click="doCast()" ng-if="card.cardType == 'sorcery'" ng-disabled="field.i.mana < card.manaCost") 使用する
+					button(ng-click="doEnterBattlefield()" ng-if="card.cardType == 'creature' || card.cardType == 'enchantField'" ng-disabled="field.mana < card.manaCost") 場に出す
+					button(ng-click="doCast()" ng-if="card.cardType == 'sorcery'" ng-disabled="field.mana < card.manaCost") 使用する
 					button(ng-click="doManaCostDiscard()") マナにする

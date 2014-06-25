@@ -2,63 +2,29 @@ var api = function(session, store){
 	var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
 	
 	return function(socket){
-		console.log("connection");
-	
 		socket.on("shuffle", function(data){
-			console.log("shuffle");
-			
 			getSession(socket, store, function(error, session){
-				console.log("shuffle - getSession");
-				
-				if(error === "cookie not found"){
-					console.log("shuffle - 偽session");
-					session = getSession.session = {};
-				}else if(error) {
-					console.log("shuffle - error");
-					return;
-				}
-				
 				if(session === void 0){
 					console.log("shuffle - error session is undefined");
 					return;
 				}
 				
-				var test = {
-					//自分の情報		
-					"i":{
-						"life":20,
-						"mana":0,
-						"creatures":[],
-						"enchantFields":[],
-						"upkeeps":[],
-						"deck":[
-							{},{},{}
-						],
-						"hands":[]
-					},
-					//相手の情報
-					"enemy":{
-						"life":20,
-						"creatures":[],
-						"enchantFields":[]
+				battleModel.update(function(error, cloneField){
+					for(var i = 0 ; i != 5 ; i++){
+						cloneField.hands.push({
+							"id":i,
+							"name":"灰色熊",
+							"cardType":"creature",
+							"creatureType":"熊",
+							"flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
+							"manaCost":1,
+							"power":2,
+							"toughness":2
+						});
 					}
-				};
-				for(var i = 0 ; i != 5 ; i++){
-					test.i.hands.push({
-						"id":i,
-						"name":"灰色熊",
-						"cardType":"creature",
-						"creatureType":"熊",
-						"flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
-						"manaCost":1,
-						"power":2,
-						"toughness":2
-					});
-				}
-				
-				session.cloneField = test;
-				
-				socket.emit("first draw", test);
+					
+					socket.emit("first draw", cloneField);
+				});
 			});
 		});
 		
@@ -83,16 +49,16 @@ var api = function(session, store){
 			console.log("play");
 			var engine = require("./public/javascripts/battle_engine.js");
 			
-			getSession(socket, store, function(error, session){
-				session.cloneField.i.hands.every(function(hand, i){
+			battleModel.update(function(error, cloneField){
+				cloneField.hands.every(function(hand, i){
 					if(cardId == hand.id){
 						console.log("play - hand");
 						console.log(hand);
 						
-						session.cloneField.card = hand;
+						cloneField.card = hand;
 						
-						engine.doEnterBattlefield.call(session.cloneField, {
-							field: session.cloneField
+						engine.doEnterBattlefield.call(cloneField, {
+							field: cloneField
 						});
 						return false;
 					}
@@ -112,7 +78,7 @@ var api = function(session, store){
 				var escapeAttackerIds = [];
 				
 				attackerIds.forEach(function(attackerId){
-					session.cloneField.i.creatures.every(function(creature){
+					session.cloneField.creatures.every(function(creature){
 						if(creature.id == attackerId){
 							creature.tap = true;
 							creature.isAttack = true;
