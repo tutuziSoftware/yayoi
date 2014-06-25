@@ -75,9 +75,32 @@ exports.BattleModel.prototype.update = function(callback){
 };
 
 exports.BattleModel.prototype.save = function(callback){
-	new battleDB(this.cloneField).save(function(error){
-		callback(error);
-	});
+	console.log('BattleModel.prototype.save');
+	var self = this;
+	
+	var copy = [
+		'hands',
+		'deck',
+		'upkeeps',
+		'enchantFields',
+		'creatures',
+		'mana',
+		'life'
+	].reduce(function(copy, key){
+		copy[key] = self.cloneField[key];
+		return copy;
+	}, {});
+	
+	console.log(copy);
+	
+	battleDB.update(
+		{'_id':this.cloneField._id},
+		{$set:copy},
+		{ upsert: false },
+		function(error){
+			callback(error);
+		}
+	);
 };
 
 /**
