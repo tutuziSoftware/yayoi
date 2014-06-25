@@ -25,6 +25,7 @@ exports.api = function(io, sessionStore){
 		//対戦開始
 		socket.on("start", function(){
 			console.log("start");
+			socket.emit('start');
 		});
 		
 		//コネクションが切れた場合は待ちフラグ解除

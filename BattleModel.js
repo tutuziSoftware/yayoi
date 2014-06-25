@@ -1,12 +1,13 @@
 var battleDB = require('./db')('battle', {
+	'userId':String,
 	'enemyId':String,
 	'life':{type:Number, default:20},
 	'mana':{type:Number, default:0},
-	'creatures':[],
-	'enchantFields':[],
-	'upkeeps':[],
-	'deck':[],
-	'hands':[]
+	'creatures':{type:Array, default:[]},
+	'enchantFields':{type:Array, default:[]},
+	'upkeeps':{type:Array, default:[]},
+	'deck':{type:Array, default:[]},
+	'hands':{type:Array, default:[]}
 });
 
 /**
@@ -16,22 +17,48 @@ exports.BattleModel = function(id){
 	this.id = id;
 };
 
-exports.start = function(callback){
-	var cloneField = new battleDB({});
-	cloneField.save(callback);
+exports.BattleModel.prototype.start = function(enemyId, callback){
+	battleDB.find({
+		'enemyId':enemyId
+	}, function(error, data){
+		if(data.length){
+			if(callback) callback('たぶん不正な操作');
+		}else{
+			console.log('battle');
+			battleDB.remove({
+				'userId':this.id
+			});
+			
+			battleDB.remove({
+				'userId':this.enemyId
+			});
+			
+			//自分のクローンフィールド
+			new battleDB({
+				'userId':this.id,
+				'enemyId':enemyId
+			}).save(callback);
+	
+			//相手のクローンフィールド
+			new battleDB({
+				'userId':enemyId,
+				'enemyId':this.id
+			}).save(callback);
+		}
+	});
 }
 
 /**
  * @param callback(error, cloneField) コンストラクタのIDを元に、クローンフィールドに関する情報を出力します。
  */
-exports.update = function(callback){
+exports.BattleModel.prototype.update = function(callback){
 	var that = this;
 	
 	battleDB.findOne({
-		'id':this.id
+		'_id':this.id
 	}, function(error, cloneField){
 		battleDb.findOne({
-			'id':cloneField.enemyId
+			'_id':cloneField.enemyId
 		}, function(error, enemyField){
 			cloneFiled.enemyField = enemyField;
 			
@@ -42,6 +69,6 @@ exports.update = function(callback){
 	});
 };
 
-exports.save = function(){
+exports.BattleModel.prototype.save = function(){
 	battleDb.save(this.cloneField);
 };

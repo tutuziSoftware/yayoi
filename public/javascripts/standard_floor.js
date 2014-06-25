@@ -9,5 +9,9 @@ function controller($scope, $http){
 			$scope.players = users;
 			$scope.$apply();
 		});
+		
+		socket.on('start', function(){
+			console.log('start');
+		});
 	});
 }

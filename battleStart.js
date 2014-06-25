@@ -1,8 +1,18 @@
 module.exports = function(req, res){
+	startStandardBattle(req);
+	startBattle();
+	
+	res.redirect('/battle');
+};
+
+function startStandardBattle(req){
 	var Model = require('./userModel.js');
 	var model = new Model(req.session);
 	
-	console.log(model);
-	console.log(req.params);
 	model.startStandardBattle(req.params.id);
-};
+}
+
+function startBattle(){
+	var battle = new (require('./BattleModel.js').BattleModel);
+	battle.start();
+}
