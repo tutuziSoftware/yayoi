@@ -1,3 +1,6 @@
+const TURN_MY = 'my turn';
+const TURN_ENEMY = 'enemy turn';
+
 var battleDB = require('./db')('battle', {
 	'userId':String,
 	'enemyId':String,
@@ -8,7 +11,9 @@ var battleDB = require('./db')('battle', {
 	'enchantFields':{type:Array, default:[]},
 	'upkeeps':{type:Array, default:[]},
 	'deck':{type:Array, default:[]},
-	'hands':{type:Array, default:[]}
+	'hands':{type:Array, default:[]},
+	//どちらのターンかを格納する
+	'turn':{type:String, default:''}
 });
 
 /**
@@ -22,6 +27,7 @@ exports.BattleModel = function(id){
 
 exports.BattleModel.prototype.start = function(enemyId, callback){
 	var that = this;	
+	var playOrDraw = Math.random() >= 0.5;
 	
 	battleDB.remove({
 		'userId':that.id
@@ -38,13 +44,15 @@ exports.BattleModel.prototype.start = function(enemyId, callback){
 			new battleDB({
 				'userId':that.id,
 				'enemyId':enemyId,
-				'urlToken':urlToken
+				'urlToken':urlToken,
+				'turn':playOrDraw ? TURN_MY : TURN_ENEMY
 			}).save(function(){
 				//相手のクローンフィールド
 				new battleDB({
 					'userId':enemyId,
 					'enemyId':that.id,
-					'urlToken':urlToken
+					'urlToken':urlToken,
+					'turn':(!playOrDraw) ? TURN_MY : TURN_ENEMY
 				}).save(function(){
 					callback();
 				});

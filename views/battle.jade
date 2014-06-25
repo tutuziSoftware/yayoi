@@ -4,6 +4,7 @@ block content
 	script(src="/javascripts/battle.js")
 	script(src="/javascripts/battle_engine.js")
 	div(ng-controller="fieldController")
+		div {{field.turn}}
 		button(ng-click="turnStart()") turnStart
 		button(ng-click="turnEnd()") turnEnd
 		button(ng-click="testEnemyAttack()") enemyAttack
