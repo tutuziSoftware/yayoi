@@ -1,6 +1,6 @@
 module.exports = function(req, res){
 	startStandardBattle(req);
-	startBattle();
+	startBattle(req);
 	
 	res.redirect('/battle');
 };
@@ -12,7 +12,7 @@ function startStandardBattle(req){
 	model.startStandardBattle(req.params.id);
 }
 
-function startBattle(){
-	var battle = new (require('./BattleModel.js').BattleModel);
-	battle.start();
+function startBattle(req){
+	var battle = new (require('./BattleModel.js').BattleModel)(req.session.userId);
+	battle.start(req.params.id);
 }

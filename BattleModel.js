@@ -18,31 +18,32 @@ exports.BattleModel = function(id){
 };
 
 exports.BattleModel.prototype.start = function(enemyId, callback){
+	var that = this;	
+	
 	battleDB.find({
 		'enemyId':enemyId
 	}, function(error, data){
 		if(data.length){
 			if(callback) callback('たぶん不正な操作');
 		}else{
-			console.log('battle');
 			battleDB.remove({
-				'userId':this.id
+				'userId':that.id
 			});
 			
 			battleDB.remove({
-				'userId':this.enemyId
+				'userId':enemyId
 			});
 			
 			//自分のクローンフィールド
 			new battleDB({
-				'userId':this.id,
+				'userId':that.id,
 				'enemyId':enemyId
 			}).save(callback);
 	
 			//相手のクローンフィールド
 			new battleDB({
 				'userId':enemyId,
-				'enemyId':this.id
+				'enemyId':that.id
 			}).save(callback);
 		}
 	});
