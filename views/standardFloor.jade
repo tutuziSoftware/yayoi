@@ -9,4 +9,4 @@ block content
 			li(ng-repeat="player in players")
 				{{player.userName}}
 				form
-					<a href="/battle/start/{{player._id}}">対戦する</a>
+					<a href="/battle/start/{{player._id}}" ng-click='start()'>対戦する</a>

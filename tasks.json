@@ -1,8 +1,7 @@
 /*
 次回予告
 
-TODO クローンフィールドの生成(戦闘用Modelを作る)
-TODO 戦闘開始を相手に通知(socket.io？)
+TODO 戦闘開始を相手に通知(socket.io、サーバ側から5秒ごとにstatusを返す)
 
 TODO テスト戦闘画面をいじってattack stepとblock stepの動作を実装する
 TODO 敵ターン中のAPIをサーバ側に仮設置する(battle.js参照)
