@@ -1,4 +1,6 @@
 var api = function(session, store){
+	var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+	
 	return function(socket){
 		console.log("connection");
 	
@@ -61,19 +63,19 @@ var api = function(session, store){
 		});
 		
 		socket.on("hand to mana", function(cardId){
-			console.log("hand to mana:" + cardId);
-			console.log("getSession.session = " + getSession.session);
-			
-			getSession(socket, store, function(error, session){
-				console.log("hand to mana - getSession");
+			battleModel.update(function(error, cloneField){
+				//console.log("hand to mana - getSession");
 				
-				session.cloneField.i.hands.every(function(hand, i){
+				cloneField.hands.every(function(hand, i){
 					if(cardId == hand.id){
-						session.cloneField.i.mana++;
-						session.cloneField.i.hands.splice(i, 1);
+						console.log('add mana');
+						cloneField.mana++;
+						cloneField.hands.splice(i, 1);
 						return false;
 					}
 				});
+				
+				socket.broadcast.emit('enemy hand to mana', battleModel.toEnemy());
 			});
 		});
 		
@@ -160,7 +162,7 @@ exports.api.id = function(io, session, cookieStore){
 			var url = '/battle/' + cloneField.urlToken;
 		
 			var tester = io.of(url);
-			tester.on("connection", api(session, cookieStore));
+			tester.on("connection", api(req.session, cookieStore));
 		
 			//TODO 対人戦の場合、最初にこのAPIを叩いた人はここで相手shuffleからのブロードキャスト待ちになる。
 		

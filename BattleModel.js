@@ -15,6 +15,8 @@ var battleDB = require('./db')('battle', {
  * @param string id クローンフィールドの一意IDです。
  */
 exports.BattleModel = function(id){
+	if(typeof id == 'object') throw 'コンストラクタの第一引数にobjectを指定出来ません。';
+	
 	this.id = id;
 };
 
@@ -74,4 +76,17 @@ exports.BattleModel.prototype.update = function(callback){
 
 exports.BattleModel.prototype.save = function(){
 	battleDb.save(this.cloneField);
+};
+
+/**
+ * 対戦相手に見せてはいけない情報を隠した状態のクローンフィールドを返します。
+ */
+exports.BattleModel.prototype.toEnemy = function(){
+	var enemyCloneField = {};
+	var cloneField = this.cloneField;
+	
+	return ['life','mana','creatures','enchantFields'].reduce(function(enemyCloneField, key){
+		enemyCloneField[key] = cloneField[key];
+		return enemyCloneField;
+	}, {});
 };

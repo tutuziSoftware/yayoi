@@ -45,6 +45,11 @@ function fieldController($scope, $http){
 				$scope.field = field;
 				$scope.$apply();
 			});
+			
+			socket.on('enemy hand to mana', function(enemyField){
+				console.log('enemy hand to mana');
+				console.log(enemyField);
+			});
 		});
 	
 		$http({
