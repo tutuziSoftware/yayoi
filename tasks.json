@@ -1,7 +1,6 @@
 /*
 次回予告
 
-TODO クローンフィールドの生成(戦闘用Modelを作る)
 TODO 戦闘開始を相手に通知(socket.io？)
 
 TODO テスト戦闘画面をいじってattack stepとblock stepの動作を実装する
