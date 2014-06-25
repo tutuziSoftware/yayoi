@@ -53,6 +53,17 @@ module.exports.prototype = {
 		},'_id status userName', callback);
 	},
 	/**
+	 * 自分の情報を返します。
+	 * このメソッドはパスワードなどの表に出てはいけない情報を消した状態の値を返します。
+	 */
+	get:function(callback){
+		var db = require("./userDB.js").db;
+		
+		db.findOne({
+			'_id':this.session.userId
+		},'_id status userName', callback);
+	},
+	/**
 	 * スタンダード対戦を開始します。
 	 */
 	startStandardBattle:function(enemyId, callback){

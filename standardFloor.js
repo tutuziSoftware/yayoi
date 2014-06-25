@@ -6,7 +6,29 @@ exports.route = function(req, res){
 
 exports.api = function(io, sessionStore){
 	floor(io, sessionStore);
+	call(io, sessionStore);
 };
+
+function call(io, sessionStore){
+	//TODO サーバ側から5秒ごとにstatusを返す
+	
+	var heartbeat = io.of('/standard_floor/heartbeat');
+	
+	heartbeat.on('connection', function(socket){
+		require('./getSession.js')(socket, sessionStore, function(error, session){
+			var model = new Model(session);
+			
+			var hb = setInterval(function(){
+				model.get(function(error, user){
+					console.log(user);
+					socket.emit('heartbeat', user.status);
+					
+					if(user.status != 'wait_standard') clearInterval(hb);
+				});
+			}, 5555);
+		});
+	});
+}
 
 /**
  * フロア画面に入った時、出た時の待ち合わせAPIです。
