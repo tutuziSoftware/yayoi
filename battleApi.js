@@ -77,11 +77,11 @@ var api = function(session, store){
 		socket.on(ATTACK_STEP_API, function(attackerIds){
 			console.log(ATTACK_STEP_API);
 			
-			getSession(socket, store, function(error, session){
+			battleModel.update(function(error, cloneField){
 				var escapeAttackerIds = [];
 				
 				attackerIds.forEach(function(attackerId){
-					session.cloneField.creatures.every(function(creature){
+					cloneField.creatures.every(function(creature){
 						if(creature.id == attackerId){
 							creature.tap = true;
 							creature.isAttack = true;
@@ -91,11 +91,7 @@ var api = function(session, store){
 					});
 				});
 				
-				console.log(ATTACK_STEP_API + " - emit");
-				socket.emit("attack step");
-				console.log("socket.broadcast.emit");
-				console.log(attackerIds);
-				console.log(escapeAttackerIds);
+				battleModel.nextTurn();
 				socket.broadcast.emit("block step", escapeAttackerIds);
 			});
 		});

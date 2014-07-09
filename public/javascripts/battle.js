@@ -52,6 +52,10 @@ function fieldController($scope, $http){
 				$scope.enemyField = enemyField;
 				$scope.$apply();
 			});
+			
+			socket.on('block step', function(){
+				console.log('block step');
+			});
 		});
 	
 		$http({

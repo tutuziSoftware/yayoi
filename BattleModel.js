@@ -98,7 +98,8 @@ exports.BattleModel.prototype.save = function(callback, isRun){
 		'enchantFields',
 		'creatures',
 		'mana',
-		'life'
+		'life',
+		'turn'
 	].reduce(function(copy, key){
 		copy[key] = self.cloneField[key];
 		return copy;
@@ -127,4 +128,34 @@ exports.BattleModel.prototype.toEnemy = function(){
 		enemyCloneField[key] = cloneField[key];
 		return enemyCloneField;
 	}, {});
+};
+
+/**
+ * 自分のターンと相手のターンを入れ替えます。
+ */
+exports.BattleModel.prototype.nextTurn = function(){
+	var that = this;
+	
+	this.update(function(error, cloneField){
+		console.log('nextTurn');
+		if(cloneField.turn === TURN_MY){
+			cloneField.turn = TURN_ENEMY;
+		}else{
+			cloneField.turn = TURN_MY;
+		}
+		
+		console.log(cloneField.turn);
+		console.log(cloneField.enemyField.turn === TURN_MY ? TURN_ENEMY : TURN_MY);
+		that.save(function(){
+			battleDB.update(
+				{'_id':cloneField.enemyField._id},
+				{$set:{
+					turn:cloneField.enemyField.turn === TURN_MY ? TURN_ENEMY : TURN_MY
+				}},
+				{ upsert: false },
+				function(error){
+				}
+			);
+		});
+	});
 };
