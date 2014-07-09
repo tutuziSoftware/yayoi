@@ -36,9 +36,6 @@ exports.BattleModel.prototype.start = function(enemyId, callback){
 			'userId':enemyId
 		}, function(){
 			var urlToken = require('node-uuid').v4();
-			console.log('userId:'+that.id);
-			console.log('userId:'+enemyId);
-			console.log('urlToken:'+urlToken);
 	
 			//自分のクローンフィールド
 			new battleDB({
@@ -82,8 +79,16 @@ exports.BattleModel.prototype.update = function(callback){
 	});
 };
 
-exports.BattleModel.prototype.save = function(callback){
-	console.log('BattleModel.prototype.save');
+/**
+ * this.cloneFieldをDBに保存します。
+ *
+ * @param callback データ保存後に呼び出されます。
+ * @param isRun 	相手ターン時はDB更新が行えませんが、例外的に更新を認める場合、ここをtrueにします。
+ */
+exports.BattleModel.prototype.save = function(callback, isRun){
+	//相手ターン時は反応しない
+	if(this.cloneField.turn === TURN_ENEMY && isRun === void 0) return;
+	
 	var self = this;
 	
 	var copy = [

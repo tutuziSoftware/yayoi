@@ -25,7 +25,7 @@ var api = function(session, store){
 					
 					battleModel.save(function(){
 						socket.emit("first draw", cloneField);
-					});
+					}, true);
 				});
 			});
 		});
