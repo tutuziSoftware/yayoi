@@ -2,11 +2,12 @@ extends layout
 
 block content
 	script(src="/javascripts/standard_floor.js")
-	h1 スタンダード戦
-	div(ng-controller="controller")
-		div 対戦者一覧
-		ul
-			li(ng-repeat="player in players")
-				{{player.userName}}
-				form
-					<a href="/battle/start/{{player._id}}" ng-click='start()'>対戦する</a>
+	div(ng-app)
+		h1 スタンダード戦
+		div(ng-controller="controller")
+			div 対戦者一覧
+			ul
+				li(ng-repeat="player in players")
+					{{player.userName}}
+					form
+						<a href="/battle/start/{{player._id}}" ng-click='start()'>対戦する</a>
