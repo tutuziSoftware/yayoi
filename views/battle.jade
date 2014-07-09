@@ -4,12 +4,13 @@ block content
 	script(src="/javascripts/battle.js")
 	script(src="/javascripts/battle_engine.js")
 	div(ng-app='yayoi')
-		div(ng-controller="fieldController", enemy-turn)
+		div(ng-controller="fieldController")
 			div {{field.turn}}
-			button(ng-click="turnStart()") turnStart
-			button(ng-click="turnEnd()") turnEnd
-			button(ng-click="testEnemyAttack()") enemyAttack
-			button(ng-click="startBlockStep()") blockStep
+			div(ng-hide='field.turn == "enemy turn"')
+				button(ng-click="turnStart()") turnStart
+				button(ng-click="turnEnd()") turnEnd
+				button(ng-click="testEnemyAttack()") enemyAttack
+				button(ng-click="startBlockStep()") blockStep
 			div(ng-if="isBlockStep")
 				button(ng-click="doBlockStep()") ブロック判定開始
 			div
@@ -23,7 +24,7 @@ block content
 			div
 				div 場に出した自分のカード
 				ul
-					li(ng-repeat="card in field.creatures")
+					li(ng-repeat="card in field.creatures" enemy-turn)
 						div
 							div {{card.name}} ({{card.power}}/{{card.toughness}}, id:{{card.id}})
 							div
@@ -32,7 +33,7 @@ block content
 								button(ng-click="doAttack()" ng-hide="card.isAttack") 攻撃する
 								button(ng-click="doAttack()" ng-show="card.isAttack") 攻撃しない
 								button(ng-if="isBlockStep" ng-click="selectBlocker(card)") ブロックを行う
-					li(ng-repeat="card in field.enchantFields")
+					li(ng-repeat="card in field.enchantFields" enemy-turn)
 						div
 							div {{card.name}} 
 							div
@@ -40,7 +41,7 @@ block content
 			div ライフ：{{field.life}}
 			div マナ：{{field.mana}}
 			ul
-				li(ng-repeat="card in field.hands")
+				li(ng-repeat="card in field.hands" enemy-turn)
 					div {{card.name}}({{card.manaCost}}
 						span(ng-if="card.creatureType") , {{card.power}}/{{card.toughness}}, id:{{card.id}})
 						span(ng-if="!card.creatureType") , id:{{card.id}})

@@ -44,8 +44,6 @@ function fieldController($scope, $http){
 				console.log("first draw");
 				$scope.field = field;
 				$scope.$apply();
-				$scope.enemyTurn();
-				$scope.$apply();
 			});
 			
 			socket.on('enemy', function(enemyField){
@@ -76,6 +74,7 @@ function fieldController($scope, $http){
 				{},{},{}
 			],
 			"hands":[],
+			'turn':'enemy turn',
 			/**
 			 * 場と手札にあるカードをIDで探索出来るよう再構築します。
 			 */
@@ -322,13 +321,10 @@ function fieldController($scope, $http){
 
 angular.module('yayoi', []).directive('enemyTurn', function(){
 	return function(scope, iElement, iAttrs){
-		console.log('enemy-turn');
-		scope.enemyTurn = function(){
-			console.log('enemy-turn:');
-			console.log(scope.field.turn);
-			if(scope.field.turn === 'enemy turn'){
-				$('button', iElement).attr('disabled', true);
-			}
-		};
+		if(scope.field === void 0 || scope.field.turn === 'enemy turn'){
+			$('button', iElement).attr('disabled', true);
+		}else if(scope.field.turn === 'my turn'){
+			$('button', iElement).attr('disabled', false);
+		}
 	};
 });
