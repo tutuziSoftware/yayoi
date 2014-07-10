@@ -134,18 +134,17 @@ exports.BattleModel.prototype.toEnemy = function(){
  * 自分のターンと相手のターンを入れ替えます。
  */
 exports.BattleModel.prototype.nextTurn = function(){
+	console.log('nextTurn');
 	var that = this;
 	
 	this.update(function(error, cloneField){
-		console.log('nextTurn');
+		console.log('nextTurn.update');
 		if(cloneField.turn === TURN_MY){
 			cloneField.turn = TURN_ENEMY;
 		}else{
 			cloneField.turn = TURN_MY;
 		}
 		
-		console.log(cloneField.turn);
-		console.log(cloneField.enemyField.turn === TURN_MY ? TURN_ENEMY : TURN_MY);
 		that.save(function(){
 			battleDB.update(
 				{'_id':cloneField.enemyField._id},
