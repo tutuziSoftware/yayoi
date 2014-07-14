@@ -62,6 +62,7 @@ function fieldController($scope, $http){
 			});
 
 			socket.on('clone field!', function(field){
+				console.log('clone field!');
 				$scope.field = field;
 				$scope.$apply();
 			});

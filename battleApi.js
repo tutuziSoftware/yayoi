@@ -95,8 +95,10 @@ var api = function(session, store){
 						});
 					});
 
-					battleModel.nextTurn();
-					socket.broadcast.emit("block step", cloneField);
+					battleModel.nextTurn(function(){
+						socket.broadcast.emit("block step", battleModel.toEnemy());
+						socket.emit('clone field!', battleModel.cloneField);
+					});
 				});
 			});
 		});
