@@ -1,32 +1,27 @@
 var api = function(session, store){
-	var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
-	
 	return function(socket){
-		console.log('api');
-
 		socket.on("shuffle", function(data){
-			console.log('shuffle');
-			console.log('shuffle - UA = ' + data);
+			getSession(socket, store, function(error, session){
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
 
-			battleModel.update(function(error, cloneField){
-				console.log('shuffle - update');
-				for(var i = 0 ; i != 2 ; i++){
-					cloneField.hands.push({
-						"id":i,
-						"name":"灰色熊",
-						"cardType":"creature",
-						"creatureType":"熊",
-						"flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
-						"manaCost":1,
-						"power":2,
-						"toughness":2
-					});
-				}
+				battleModel.update(function(error, cloneField){
+					for(var i = 0 ; i != 2 ; i++){
+						cloneField.hands.push({
+							"id":i,
+							"name":"灰色熊",
+							"cardType":"creature",
+							"creatureType":"熊",
+							"flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
+							"manaCost":1,
+							"power":2,
+							"toughness":2
+						});
+					}
 
-				battleModel.save(function(){
-					console.log('shuffle - save');
-					socket.emit("first draw", cloneField);
-				}, true);
+					battleModel.save(function(){
+						socket.emit("first draw", cloneField);
+					}, true);
+				});
 			});
 		});
 
