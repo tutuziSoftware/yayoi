@@ -96,7 +96,7 @@ var api = function(session, store){
 					});
 
 					battleModel.nextTurn();
-					socket.broadcast.emit("block step", escapeAttackerIds);
+					socket.broadcast.emit("block step", cloneField);
 				});
 			});
 		});
@@ -107,8 +107,10 @@ var api = function(session, store){
 		
 		socket.on("clone field?", function(){
 			getSession(socket, store, function(error, session){
-				var cloneField = "cloneField" in session ? session.cloneField : null;
-				socket.emit("clone field!", cloneField);
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+				battleModel.update(function(error, cloneField){
+					socket.emit("clone field!", cloneField);
+				});
 			});
 		});
 	};

@@ -90,7 +90,10 @@ exports.BattleModel.prototype.update = function(callback){
  */
 exports.BattleModel.prototype.save = function(callback, isRun){
 	//相手ターン時は反応しない
-	if(this.cloneField.turn === TURN_ENEMY && isRun === void 0) return;
+	if(this.cloneField.turn === TURN_ENEMY && isRun === void 0) {
+		callback('error! 相手ターン時なのでDB書き込み権限はありません。必要に応じてisRunをtrueにしてください', null);
+		return;
+	}
 	
 	var self = this;
 	
@@ -142,11 +145,13 @@ exports.BattleModel.prototype.nextTurn = function(){
 	
 	this.update(function(error, cloneField){
 		console.log('nextTurn.update');
+		console.log(cloneField.turn);
 		if(cloneField.turn === TURN_MY){
 			cloneField.turn = TURN_ENEMY;
 		}else{
 			cloneField.turn = TURN_MY;
 		}
+		console.log(cloneField.turn);
 		
 		that.save(function(){
 			battleDB.update(
@@ -156,8 +161,9 @@ exports.BattleModel.prototype.nextTurn = function(){
 				}},
 				{ upsert: false },
 				function(error){
+					console.log('nextTurn.update.save : ' + error);
 				}
 			);
-		});
+		}, true);
 	});
 };

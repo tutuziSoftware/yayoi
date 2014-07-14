@@ -53,8 +53,17 @@ function fieldController($scope, $http){
 				$scope.$apply();
 			});
 			
-			socket.on('block step', function(){
+			socket.on('block step', function(enemyField){
 				console.log('block step');
+				$scope.enemyField = enemyField;
+				$scope.$apply();
+
+				socket.emit('clone field?');
+			});
+
+			socket.on('clone field!', function(field){
+				$scope.field = field;
+				$scope.$apply();
 			});
 		});
 	
