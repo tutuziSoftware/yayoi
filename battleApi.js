@@ -3,31 +3,27 @@ var api = function(session, store){
 	
 	return function(socket){
 		socket.on("shuffle", function(data){
-			getSession(socket, store, function(error, session){
-				if(session === void 0){
-					console.log("shuffle - error session is undefined");
-					return;
-				}
-				
-				battleModel.update(function(error, cloneField){
-					for(var i = 0 ; i != 5 ; i++){
-						cloneField.hands.push({
-							"id":i,
-							"name":"灰色熊",
-							"cardType":"creature",
-							"creatureType":"熊",
-							"flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
-							"manaCost":1,
-							"power":2,
-							"toughness":2
-						});
-					}
-					
-					battleModel.save(function(){
-						socket.emit("first draw", cloneField);
-					}, true);
-				});
-			});
+			console.log('shuffle');
+			console.log('shuffle - UA = ' + data);
+
+            battleModel.update(function(error, cloneField){
+                for(var i = 0 ; i != 5 ; i++){
+                    cloneField.hands.push({
+                        "id":i,
+                        "name":"灰色熊",
+                        "cardType":"creature",
+                        "creatureType":"熊",
+                        "flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
+                        "manaCost":1,
+                        "power":2,
+                        "toughness":2
+                    });
+                }
+
+                battleModel.save(function(){
+                    socket.emit("first draw", cloneField);
+                }, true);
+            });
 		});
 		
 		socket.on("hand to mana", function(cardId){
@@ -102,8 +98,6 @@ var api = function(session, store){
 		
 		socket.on("clone field?", function(){
 			getSession(socket, store, function(error, session){
-				console.log("clone field!");
-				console.log(session);
 				var cloneField = "cloneField" in session ? session.cloneField : null;
 				socket.emit("clone field!", cloneField);
 			});
@@ -123,7 +117,6 @@ exports.api.id = function(io, session, cookieStore){
 		var model = new Model(req.session.userId);
 		
 		model.update(function(error, cloneField){
-			console.log(cloneField);
 			var url = '/battle/' + cloneField.urlToken;
 		
 			var tester = io.of(url);
@@ -149,8 +142,7 @@ exports.tester.api.id = function(io, session, cookieStore){
 	
 	return function(req, res){
 		var result = api(req, res);
-		console.log('http://localhost:3000'+result.value);
-		
+
 		result.tester.on("connection", function(){
 			if(result.result) {
 				//socket.ioをサーバ側で開く
@@ -158,11 +150,8 @@ exports.tester.api.id = function(io, session, cookieStore){
 					'force new connection':true
 				});
 				socket.on("connect", function(){
-					console.log("tester connect!");
 					robot(socket);
 				});
-				
-				console.log("exports.tester.api.id - result.result = true");
 			}
 		});
 	};
@@ -172,8 +161,6 @@ function robot(socket){
 	socket.emit("shuffle");
 	
 	socket.on("block step", function(attackerIds){
-		console.log("tester block step");
-		
 		getSession(socket, null, function(error, session){
 			var attackers = session.cloneField.enemy.creatures.filter(function(creature){
 				for(var i = 0 ; i != attackerIds.length ; i++){
@@ -182,10 +169,6 @@ function robot(socket){
 					}
 				}
 			});
-			
-			console.log("robot - block step");
-			console.log(session.enemy.creatures);
-			console.log(attackers);
 		});
 	});
 }
