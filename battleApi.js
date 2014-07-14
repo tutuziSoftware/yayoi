@@ -121,9 +121,7 @@ exports.api.id = function(io, session, cookieStore){
 		
 			var tester = io.of(url);
 			tester.on("connection", api(req.session, cookieStore));
-		
-			//TODO 対人戦の場合、最初にこのAPIを叩いた人はここで相手shuffleからのブロードキャスト待ちになる。
-		
+
 			var result = {
 				result:true,
 				value:url

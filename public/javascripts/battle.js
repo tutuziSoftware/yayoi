@@ -58,13 +58,6 @@ function fieldController($scope, $http){
 			});
 		});
 	
-		$http({
-			"method":"get",
-			"url":"http://localhost:3000/javascripts/cards.js"
-		}).success(function(res){
-			var cards = eval(res);
-		});
-	
 		$scope.socket = socket;
 	
 		//敵を含むすべての場のルート
