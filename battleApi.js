@@ -8,28 +8,28 @@ var api = function(session, store){
 			console.log('shuffle');
 			console.log('shuffle - UA = ' + data);
 
-            battleModel.update(function(error, cloneField){
+			battleModel.update(function(error, cloneField){
 				console.log('shuffle - update');
-                for(var i = 0 ; i != 2 ; i++){
-                    cloneField.hands.push({
-                        "id":i,
-                        "name":"灰色熊",
-                        "cardType":"creature",
-                        "creatureType":"熊",
-                        "flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
-                        "manaCost":1,
-                        "power":2,
-                        "toughness":2
-                    });
-                }
+				for(var i = 0 ; i != 2 ; i++){
+					cloneField.hands.push({
+						"id":i,
+						"name":"灰色熊",
+						"cardType":"creature",
+						"creatureType":"熊",
+						"flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
+						"manaCost":1,
+						"power":2,
+						"toughness":2
+					});
+				}
 
-                battleModel.save(function(){
+				battleModel.save(function(){
 					console.log('shuffle - save');
-                    socket.emit("first draw", cloneField);
-                }, true);
-            });
+					socket.emit("first draw", cloneField);
+				}, true);
+			});
 		});
-		
+
 		socket.on("hand to mana", function(cardId){
 			battleModel.update(function(error, cloneField){
 				cloneField.hands.every(function(hand, i){
@@ -128,7 +128,7 @@ exports.api.id = function(io, session, cookieStore){
 
 			var tester = io.of(url);
 			//対戦者に選ばれた方がイベントリスナーをもう一度設置してしまう為、二度イベントが発火するようになってしまう
-			tester.on("connection", api(req.session, cookieStore));
+			if(cloneField.isElected == false) tester.on("connection", api(req.session, cookieStore));
 			
 			var result = {
 				result:true,
