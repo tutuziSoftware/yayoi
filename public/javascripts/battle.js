@@ -38,7 +38,7 @@ function fieldController($scope, $http){
 		socket.on("connect", function(){
 			console.log("connect");
 		
-			socket.emit("shuffle", "");
+			socket.emit("shuffle", navigator.userAgent);
 		
 			socket.on("first draw", function(field){
 				console.log("first draw");
@@ -56,13 +56,6 @@ function fieldController($scope, $http){
 			socket.on('block step', function(){
 				console.log('block step');
 			});
-		});
-	
-		$http({
-			"method":"get",
-			"url":"http://localhost:3000/javascripts/cards.js"
-		}).success(function(res){
-			var cards = eval(res);
 		});
 	
 		$scope.socket = socket;

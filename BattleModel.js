@@ -13,7 +13,9 @@ var battleDB = require('./db')('battle', {
 	'deck':{type:Array, default:[]},
 	'hands':{type:Array, default:[]},
 	//どちらのターンかを格納する
-	'turn':{type:String, default:''}
+	'turn':{type:String, default:''},
+	//対戦相手として選ばれた場合、trueになる。主にsocket.ioのイベントリスナー二重登録を防ぐ為に使う
+	'isElected':{type:Boolean, default:false}
 });
 
 /**
@@ -49,7 +51,8 @@ exports.BattleModel.prototype.start = function(enemyId, callback){
 					'userId':enemyId,
 					'enemyId':that.id,
 					'urlToken':urlToken,
-					'turn':(!playOrDraw) ? TURN_MY : TURN_ENEMY
+					'turn':(!playOrDraw) ? TURN_MY : TURN_ENEMY,
+					'isElected': true
 				}).save(function(){
 					callback();
 				});
@@ -134,18 +137,17 @@ exports.BattleModel.prototype.toEnemy = function(){
  * 自分のターンと相手のターンを入れ替えます。
  */
 exports.BattleModel.prototype.nextTurn = function(){
+	console.log('nextTurn');
 	var that = this;
 	
 	this.update(function(error, cloneField){
-		console.log('nextTurn');
+		console.log('nextTurn.update');
 		if(cloneField.turn === TURN_MY){
 			cloneField.turn = TURN_ENEMY;
 		}else{
 			cloneField.turn = TURN_MY;
 		}
 		
-		console.log(cloneField.turn);
-		console.log(cloneField.enemyField.turn === TURN_MY ? TURN_ENEMY : TURN_MY);
 		that.save(function(){
 			battleDB.update(
 				{'_id':cloneField.enemyField._id},

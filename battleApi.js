@@ -1,16 +1,11 @@
 var api = function(session, store){
-	var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
-	
 	return function(socket){
 		socket.on("shuffle", function(data){
 			getSession(socket, store, function(error, session){
-				if(session === void 0){
-					console.log("shuffle - error session is undefined");
-					return;
-				}
-				
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
 				battleModel.update(function(error, cloneField){
-					for(var i = 0 ; i != 5 ; i++){
+					for(var i = 0 ; i != 2 ; i++){
 						cloneField.hands.push({
 							"id":i,
 							"name":"灰色熊",
@@ -22,49 +17,56 @@ var api = function(session, store){
 							"toughness":2
 						});
 					}
-					
+
 					battleModel.save(function(){
 						socket.emit("first draw", cloneField);
 					}, true);
 				});
 			});
 		});
-		
+
 		socket.on("hand to mana", function(cardId){
-			battleModel.update(function(error, cloneField){
-				cloneField.hands.every(function(hand, i){
-					if(cardId == hand.id){
-						cloneField.mana++;
-						cloneField.hands.splice(i, 1);
-						return false;
-					}
-				});
-				
-				battleModel.save(function(){
-					socket.broadcast.emit('enemy', battleModel.toEnemy());
+			getSession(socket, store, function(error, session){
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
+				battleModel.update(function(error, cloneField){
+					cloneField.hands.every(function(hand, i){
+						if(cardId == hand.id){
+							cloneField.mana++;
+							cloneField.hands.splice(i, 1);
+							return false;
+						}
+					});
+
+					battleModel.save(function(){
+						socket.broadcast.emit('enemy', battleModel.toEnemy());
+					});
 				});
 			});
 		});
 		
 		socket.on("play", function(cardId){
-			var engine = require("./public/javascripts/battle_engine.js");
-			
-			battleModel.update(function(error, cloneField){
-				cloneField.hands.every(function(hand, i){
-					if(cardId == hand.id){
-						cloneField.card = hand;
-						
-						engine.doEnterBattlefield.call(cloneField, {
-							field: cloneField
-						});
-						
-						battleModel.save(function(){
-							socket.broadcast.emit('enemy', battleModel.toEnemy());
-						});
-						return false;
-					}
-					
-					return true;
+			getSession(socket, store, function(error, session){
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+				var engine = require("./public/javascripts/battle_engine.js");
+
+				battleModel.update(function(error, cloneField){
+					cloneField.hands.every(function(hand, i){
+						if(cardId == hand.id){
+							cloneField.card = hand;
+
+							engine.doEnterBattlefield.call(cloneField, {
+								field: cloneField
+							});
+
+							battleModel.save(function(){
+								socket.broadcast.emit('enemy', battleModel.toEnemy());
+							});
+							return false;
+						}
+
+						return true;
+					});
 				});
 			});
 		});
@@ -75,24 +77,27 @@ var api = function(session, store){
 		
 		const ATTACK_STEP_API = "attack step";
 		socket.on(ATTACK_STEP_API, function(attackerIds){
-			console.log(ATTACK_STEP_API);
-			
-			battleModel.update(function(error, cloneField){
-				var escapeAttackerIds = [];
-				
-				attackerIds.forEach(function(attackerId){
-					cloneField.creatures.every(function(creature){
-						if(creature.id == attackerId){
-							creature.tap = true;
-							creature.isAttack = true;
-							escapeAttackerIds.push(attackerId);
-							return false;
-						}
+			getSession(socket, store, function(error, session){
+				console.log(ATTACK_STEP_API);
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
+				battleModel.update(function(error, cloneField){
+					var escapeAttackerIds = [];
+
+					attackerIds.forEach(function(attackerId){
+						cloneField.creatures.every(function(creature){
+							if(creature.id == attackerId){
+								creature.tap = true;
+								creature.isAttack = true;
+								escapeAttackerIds.push(attackerId);
+								return false;
+							}
+						});
 					});
+
+					battleModel.nextTurn();
+					socket.broadcast.emit("block step", escapeAttackerIds);
 				});
-				
-				battleModel.nextTurn();
-				socket.broadcast.emit("block step", escapeAttackerIds);
 			});
 		});
 		
@@ -102,8 +107,6 @@ var api = function(session, store){
 		
 		socket.on("clone field?", function(){
 			getSession(socket, store, function(error, session){
-				console.log("clone field!");
-				console.log(session);
 				var cloneField = "cloneField" in session ? session.cloneField : null;
 				socket.emit("clone field!", cloneField);
 			});
@@ -121,16 +124,17 @@ exports.api.id = function(io, session, cookieStore){
 	return function(req, res){
 		var Model = require('./BattleModel.js').BattleModel;
 		var model = new Model(req.session.userId);
-		
+
+		console.log('exports.api.id');
+
 		model.update(function(error, cloneField){
-			console.log(cloneField);
+			console.log('exports.api.id - model.update');
 			var url = '/battle/' + cloneField.urlToken;
-		
+
 			var tester = io.of(url);
-			tester.on("connection", api(req.session, cookieStore));
-		
-			//TODO 対人戦の場合、最初にこのAPIを叩いた人はここで相手shuffleからのブロードキャスト待ちになる。
-		
+			//対戦者に選ばれた方がイベントリスナーをもう一度設置してしまう為、二度イベントが発火するようになってしまう
+			if(cloneField.isElected == false) tester.on("connection", api(req.session, cookieStore));
+			
 			var result = {
 				result:true,
 				value:url
@@ -149,8 +153,7 @@ exports.tester.api.id = function(io, session, cookieStore){
 	
 	return function(req, res){
 		var result = api(req, res);
-		console.log('http://localhost:3000'+result.value);
-		
+
 		result.tester.on("connection", function(){
 			if(result.result) {
 				//socket.ioをサーバ側で開く
@@ -158,11 +161,8 @@ exports.tester.api.id = function(io, session, cookieStore){
 					'force new connection':true
 				});
 				socket.on("connect", function(){
-					console.log("tester connect!");
 					robot(socket);
 				});
-				
-				console.log("exports.tester.api.id - result.result = true");
 			}
 		});
 	};
@@ -172,8 +172,6 @@ function robot(socket){
 	socket.emit("shuffle");
 	
 	socket.on("block step", function(attackerIds){
-		console.log("tester block step");
-		
 		getSession(socket, null, function(error, session){
 			var attackers = session.cloneField.enemy.creatures.filter(function(creature){
 				for(var i = 0 ; i != attackerIds.length ; i++){
@@ -182,10 +180,6 @@ function robot(socket){
 					}
 				}
 			});
-			
-			console.log("robot - block step");
-			console.log(session.enemy.creatures);
-			console.log(attackers);
 		});
 	});
 }
