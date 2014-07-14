@@ -26,40 +26,47 @@ var api = function(session, store){
 		});
 
 		socket.on("hand to mana", function(cardId){
-			battleModel.update(function(error, cloneField){
-				cloneField.hands.every(function(hand, i){
-					if(cardId == hand.id){
-						cloneField.mana++;
-						cloneField.hands.splice(i, 1);
-						return false;
-					}
-				});
-				
-				battleModel.save(function(){
-					socket.broadcast.emit('enemy', battleModel.toEnemy());
+			getSession(socket, store, function(error, session){
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
+				battleModel.update(function(error, cloneField){
+					cloneField.hands.every(function(hand, i){
+						if(cardId == hand.id){
+							cloneField.mana++;
+							cloneField.hands.splice(i, 1);
+							return false;
+						}
+					});
+
+					battleModel.save(function(){
+						socket.broadcast.emit('enemy', battleModel.toEnemy());
+					});
 				});
 			});
 		});
 		
 		socket.on("play", function(cardId){
-			var engine = require("./public/javascripts/battle_engine.js");
-			
-			battleModel.update(function(error, cloneField){
-				cloneField.hands.every(function(hand, i){
-					if(cardId == hand.id){
-						cloneField.card = hand;
-						
-						engine.doEnterBattlefield.call(cloneField, {
-							field: cloneField
-						});
-						
-						battleModel.save(function(){
-							socket.broadcast.emit('enemy', battleModel.toEnemy());
-						});
-						return false;
-					}
-					
-					return true;
+			getSession(socket, store, function(error, session){
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+				var engine = require("./public/javascripts/battle_engine.js");
+
+				battleModel.update(function(error, cloneField){
+					cloneField.hands.every(function(hand, i){
+						if(cardId == hand.id){
+							cloneField.card = hand;
+
+							engine.doEnterBattlefield.call(cloneField, {
+								field: cloneField
+							});
+
+							battleModel.save(function(){
+								socket.broadcast.emit('enemy', battleModel.toEnemy());
+							});
+							return false;
+						}
+
+						return true;
+					});
 				});
 			});
 		});
@@ -70,24 +77,27 @@ var api = function(session, store){
 		
 		const ATTACK_STEP_API = "attack step";
 		socket.on(ATTACK_STEP_API, function(attackerIds){
-			console.log(ATTACK_STEP_API);
-			
-			battleModel.update(function(error, cloneField){
-				var escapeAttackerIds = [];
-				
-				attackerIds.forEach(function(attackerId){
-					cloneField.creatures.every(function(creature){
-						if(creature.id == attackerId){
-							creature.tap = true;
-							creature.isAttack = true;
-							escapeAttackerIds.push(attackerId);
-							return false;
-						}
+			getSession(socket, store, function(error, session){
+				console.log(ATTACK_STEP_API);
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
+				battleModel.update(function(error, cloneField){
+					var escapeAttackerIds = [];
+
+					attackerIds.forEach(function(attackerId){
+						cloneField.creatures.every(function(creature){
+							if(creature.id == attackerId){
+								creature.tap = true;
+								creature.isAttack = true;
+								escapeAttackerIds.push(attackerId);
+								return false;
+							}
+						});
 					});
+
+					battleModel.nextTurn();
+					socket.broadcast.emit("block step", escapeAttackerIds);
 				});
-				
-				battleModel.nextTurn();
-				socket.broadcast.emit("block step", escapeAttackerIds);
 			});
 		});
 		
