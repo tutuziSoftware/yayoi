@@ -38,7 +38,7 @@ function fieldController($scope, $http){
 		socket.on("connect", function(){
 			console.log("connect");
 		
-			socket.emit("shuffle", "");
+			socket.emit("shuffle", navigator.userAgent);
 		
 			socket.on("first draw", function(field){
 				console.log("first draw");
