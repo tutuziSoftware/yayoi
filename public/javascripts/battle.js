@@ -61,8 +61,12 @@ function fieldController($scope, $http){
 				socket.emit('clone field?');
 			});
 
+			socket.on('untap step', function(field){
+				$scope.field = field;
+				$scope.$apply();
+			});
+
 			socket.on('clone field!', function(field){
-				console.log('clone field!');
 				$scope.field = field;
 				$scope.$apply();
 			});
@@ -250,6 +254,8 @@ function fieldController($scope, $http){
 			
 				//ブロックステップの終了
 				$scope.isBlockStep = false;
+				socket.emit('block step');
+				socket.emit('untap step');
 			};
 		})();
 	

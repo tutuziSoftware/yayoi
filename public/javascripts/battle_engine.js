@@ -7,6 +7,23 @@ if(typeof window === "undefined"){
 
 (function(){
 
+/**
+ * アンタップフェイズを行う関数です。
+ *
+ * this(クライアント): $scope
+ * this(サーバ): {field: {} }
+ */
+battle.doUntap = function(){
+	if(this.field.turn !== 'my turn') return;
+
+	this.field.creatures.forEach(function(creature){
+		creature.tap = false;
+		creature.isAttack = false;
+	});
+	this.field.enchantFields.forEach(function(enchantField){
+		enchantField.tap = false;
+	});
+};
 
 /*
 現状：angulerjsで動かしていた「場に出す」「コストを支払う」機能をここにコピペした

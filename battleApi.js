@@ -1,3 +1,5 @@
+var engine = require("./public/javascripts/battle_engine.js");
+
 var api = function(session, store){
 	return function(socket){
 		socket.on("shuffle", function(data){
@@ -116,6 +118,22 @@ var api = function(session, store){
 		
 		socket.on("block step", function(blockerIds){
 			console.log("block step");
+		});
+
+		socket.on('untap step', function(){
+			getSession(socket, store, function(error, session){
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
+				battleModel.update(function(error, cloneField){
+					engine.doUntap.call({
+						'field':cloneField
+					});
+
+					battleModel.save(function(){
+						socket.emit('untap step', battleModel.cloneField);
+					});
+				});
+			});
 		});
 		
 		socket.on("clone field?", function(){
