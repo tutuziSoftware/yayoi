@@ -3,6 +3,7 @@
  * グローバルに置くようにする。
  */
 var field;
+var enemyField;
 
 function fieldController($scope, $http){
 	$http({
@@ -110,8 +111,8 @@ function fieldController($scope, $http){
 				}, this);
 			}
 		};
-		
-		$scope.enemyField = {
+
+		enemyField = $scope.enemyField = {
 			"life":20,
 			"mana":0,
 			"creatures":[],
@@ -317,7 +318,7 @@ function fieldController($scope, $http){
 		 * 1体のクリーチャーを破壊します。
 		 */
 		function doCreatureDestroy(targetCreature){
-			[field, field.enemyField].forEach(function(field){
+			[field, enemyField].forEach(function(field){
 				field.creatures.some(function(creature, index){
 					if(creature == targetCreature) {
 						field[player].creatures.splice(index, 1);
