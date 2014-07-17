@@ -58,7 +58,10 @@ module.exports.prototype = {
 	 */
 	get:function(callback){
 		var db = require("./userDB.js").db;
-		
+
+		if(this.session === void 0) throw 'this.session.userIdがundefinedです';
+		if(this.session.userId === void 0) throw 'this.session.userIdがundefinedです';
+
 		db.findOne({
 			'_id':this.session.userId
 		},'_id status userName', callback);
