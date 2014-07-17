@@ -9,7 +9,7 @@ var api = function(session, store){
 				battleModel.update(function(error, cloneField){
 					for(var i = 0 ; i != 2 ; i++){
 						cloneField.hands.push({
-							"id":i,
+							"id":require('node-uuid').v4(),
 							"name":"灰色熊",
 							"cardType":"creature",
 							"creatureType":"熊",
