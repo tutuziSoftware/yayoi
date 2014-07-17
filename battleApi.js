@@ -84,6 +84,11 @@ var api = function(session, store){
 				battleModel.update(function(error, cloneField){
 					var escapeAttackerIds = [];
 
+					cloneField.creatures.forEach(function(creature){
+						creature.tap = false;
+						creature.isAttack = false;
+					});
+
 					attackerIds.forEach(function(attackerId){
 						cloneField.creatures.every(function(creature){
 							if(creature.id == attackerId){
@@ -92,12 +97,18 @@ var api = function(session, store){
 								escapeAttackerIds.push(attackerId);
 								return false;
 							}
+
+							return true;
 						});
 					});
 
-					battleModel.nextTurn(function(){
-						socket.broadcast.emit("block step", battleModel.toEnemy());
-						socket.emit('clone field!', battleModel.cloneField);
+					console.log(escapeAttackerIds);
+
+					battleModel.save(function(){
+						battleModel.nextTurn(function(){
+							socket.broadcast.emit("block step", battleModel.toEnemy());
+							socket.emit('clone field!', battleModel.cloneField);
+						});
 					});
 				});
 			});
