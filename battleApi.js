@@ -80,31 +80,20 @@ var api = function(session, store){
 		const ATTACK_STEP_API = "attack step";
 		socket.on(ATTACK_STEP_API, function(attackerIds){
 			getSession(socket, store, function(error, session){
-				console.log(ATTACK_STEP_API);
 				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
 
 				battleModel.update(function(error, cloneField){
-					var escapeAttackerIds = [];
-
-					cloneField.creatures.forEach(function(creature){
+					Object.keys(cloneField.creatures).forEach(function(key){
+						var creature = cloneField.creatures[key];
 						creature.tap = false;
 						creature.isAttack = false;
 					});
 
 					attackerIds.forEach(function(attackerId){
-						cloneField.creatures.every(function(creature){
-							if(creature.id == attackerId){
-								creature.tap = true;
-								creature.isAttack = true;
-								escapeAttackerIds.push(attackerId);
-								return false;
-							}
-
-							return true;
-						});
+						var attacker = cloneField.creatures[attackerId];
+						attacker.tap = true;
+						attacker.isAttack = true;
 					});
-
-					console.log(escapeAttackerIds);
 
 					battleModel.save(function(){
 						battleModel.nextTurn(function(){

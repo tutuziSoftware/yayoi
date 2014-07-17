@@ -7,7 +7,7 @@ var battleDB = require('./db')('battle', {
 	'urlToken':String,
 	'life':{type:Number, default:20},
 	'mana':{type:Number, default:0},
-	'creatures':{type:Array, default:[]},
+	'creatures':{type:Object, default:Object},
 	'enchantFields':{type:Array, default:[]},
 	'upkeeps':{type:Array, default:[]},
 	'deck':{type:Array, default:[]},

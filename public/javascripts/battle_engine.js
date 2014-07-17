@@ -46,7 +46,13 @@ battle.doEnterBattlefield = function($scope){
 	
 	//マナコストの支払い
 	if(doManaCost($scope, this)){
-		if(this.card.cardType == "creature") $scope.field.creatures.push(this.card);
+		if(this.card.cardType == "creature") {
+			if($scope.field.creatures === void 0){
+				$scope.field.creatures = {};
+			}
+
+			$scope.field.creatures[this.card.id] = this.card;
+		}
 		if(this.card.cardType == "enchantField") $scope.field.enchantFields.push(this.card);
 		
 		if(this.card.doEnterBattlefield) this.card.doEnterBattlefield($scope.field);

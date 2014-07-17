@@ -82,7 +82,7 @@ function fieldController($scope, $http){
 		field = $scope.field = {
 			"life":20,
 			"mana":0,
-			"creatures":[],
+			"creatures":{},
 			"enchantFields":[],
 			"upkeeps":[],
 			"deck":[
@@ -285,14 +285,14 @@ function fieldController($scope, $http){
 		 * 自分のターンを終了します
 		 */
 		$scope.turnEnd = function(){
-			var creatures = $scope.field.creatures.filter(function(creature){
-				return creature.isAttack;
-			}).map(function(creature){
-				return creature.id;
+			var creatures = Object.keys($scope.field.creatures).filter(function(key){
+				return $scope.field.creatures[key].isAttack;
+			}).map(function(key){
+				return $scope.field.creatures[key].id;
 			});
-			
+
 			console.log(creatures);
-			
+
 			socket.emit("attack step", creatures);
 		};
 	
