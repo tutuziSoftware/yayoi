@@ -58,6 +58,9 @@ function fieldController($scope, $http){
 				$scope.enemyField = enemyField;
 				$scope.$apply();
 
+				//TODO ブロックステップ開始時の処理をここに置く
+				$scope.isBlockStep = true;
+
 				socket.emit('clone field?');
 			});
 
@@ -193,15 +196,6 @@ function fieldController($scope, $http){
 			$scope.enemyAttacker = {};
 			var selectBlocker;
 		
-			//TODO ブロックステップ実装前に、カードに一意なIDを振るようにする
-		
-			/**
-			 * ブロックステップを開始します。
-			 */
-			$scope.startBlockStep = function(){
-				$scope.isBlockStep = true;
-			};
-		
 			/**
 			 * ブロック対象を決定します。
 			 */
@@ -226,6 +220,9 @@ function fieldController($scope, $http){
 			
 				//戦闘
 				$scope.block.forEach(function(pair){
+					//アタッカーとブロッカーが紐づいていない場合、処理を飛ばす
+					if(pair.attacker === void 0 || pair.blocker === void 0) return;
+
 					var attacker = pair.attacker;
 					var blocker = pair.blocker;
 				
@@ -238,6 +235,8 @@ function fieldController($scope, $http){
 			
 				//戦闘後、タフネスが0になったクリーチャーを墓地に送る
 				$scope.block.forEach(function(pair){
+					if(pair.attacker === void 0 || pair.blocker === void 0) return;
+
 					var attacker = pair.attacker;
 					var blocker = pair.blocker;
 				
@@ -318,8 +317,8 @@ function fieldController($scope, $http){
 		 * 1体のクリーチャーを破壊します。
 		 */
 		function doCreatureDestroy(targetCreature){
-			["i", "enemy"].forEach(function(player){
-				field[player].creatures.some(function(creature, index){
+			[field, field.enemyField].forEach(function(field){
+				field.creatures.some(function(creature, index){
 					if(creature == targetCreature) {
 						field[player].creatures.splice(index, 1);
 						if(creature.doLeaveBattlefield) creature.doLeaveBattlefield(field);

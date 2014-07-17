@@ -21,6 +21,7 @@ block content
 						li(ng-repeat="card in enemyField.creatures")
 							div
 								div {{card.name}} ({{card.power}}/{{card.toughness}}, id:{{card.id}}) {{card.isAttack ? '[攻撃]' : ''}}
+								button(ng-if="isBlockStep" ng-click="selectAttacker(card)") ブロックを行う
 			div
 				div 場に出した自分のカード
 				ul
