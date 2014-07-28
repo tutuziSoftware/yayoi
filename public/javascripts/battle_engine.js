@@ -16,10 +16,12 @@ if(typeof window === "undefined"){
 battle.doUntap = function(){
 	if(this.field.turn !== 'my turn') return;
 
-	this.field.creatures.forEach(function(creature){
+	Object.keys(this.field.creatures).forEach(function(key){
+		var creature = this.field.creatures[key];
 		creature.tap = false;
 		creature.isAttack = false;
-	});
+	}, this);
+
 	this.field.enchantFields.forEach(function(enchantField){
 		enchantField.tap = false;
 	});

@@ -119,7 +119,7 @@ var api = function(session, store){
 					});
 
 					battleModel.save(function(){
-						socket.emit('untap step', battleModel.cloneField);
+						socket.emit('untap step', cloneField);
 					});
 				});
 			});
