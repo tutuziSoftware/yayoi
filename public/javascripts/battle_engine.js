@@ -7,6 +7,80 @@ if(typeof window === "undefined"){
 
 (function(){
 	/**
+	 * ブロックステップを処理します。
+	 *
+	 * @param field 自分のフィールドです
+	 * @param enemyField 相手のフィールドです
+	 * @param pairs [
+	 * 				{
+	 * 					"attacker":{ ... }, //必須値；攻撃するクリーチャー
+	 * 					"blocker":{ ... }   //オプション：ブロックするクリーチャー
+	 * 				}
+	 * 				]
+	 */
+	battle.doBlockStep = function(field, enemyField, pairs){
+		doBlock(field, enemyField, pairs);
+		doDirectAttack(field, pairs);
+
+		//TODO scoket.ioで処理を飛ばす
+	};
+
+	/**
+	 * ブロックを処理します。
+	 * @param field
+	 * @param enemyField
+	 * @param pairs
+	 */
+	function doBlock(field, enemyField, pairs){
+		var blockedPairs = pairs.filter(function(pair){
+			//アタッカーとブロッカーが紐づいていない場合、処理を飛ばす
+			return pair.attacker !== void 0 && pair.blocker !== void 0;
+		});
+
+		//戦闘
+		blockedPairs.forEach(function(pair){
+			var attacker = pair.attacker;
+			var blocker = pair.blocker;
+
+			blocker.toughness -= attacker.power;
+
+			if(blocker.toughness >= 1){
+				attacker.toughness -= blocker.power;
+			}
+		});
+
+		//戦闘後、タフネスが0になったクリーチャーを墓地に送る
+		blockedPairs.forEach(function(pair){
+			if(pair.attacker === void 0 || pair.blocker === void 0) return;
+
+			var attacker = pair.attacker;
+			var blocker = pair.blocker;
+
+			if(blocker.toughness <= 0){
+				doCreatureDestroy(field, enemyField, blocker);
+			}
+
+			if(attacker.toughness <= 0){
+				doCreatureDestroy(field, enemyField, attacker);
+			}
+		});
+	}
+
+	/**
+	 * プレイヤーへのダメージを処理します。
+	 * @param field
+	 * @param pairs
+	 */
+	function doDirectAttack(field, pairs){
+		var unblock = pairs.filter(function(pair){
+			return pair.attacker !== void 0 && pair.blocker === void 0;
+		});
+		unblock.forEach(function(attacker){
+			field.life -= attacker.attacker.power;
+		});
+	}
+
+	/**
 	 * アンタップフェイズを行う関数です。
 	 *
 	 * this(クライアント): $scope
@@ -76,5 +150,21 @@ if(typeof window === "undefined"){
 		}
 
 		return false;
+	}
+
+	/**
+	 * 1体のクリーチャーを破壊します。
+	 */
+	function doCreatureDestroy(field, enemyField, targetCreature){
+		[field, enemyField].forEach(function(field){
+			var destroyCreature = field.creatures[targetCreature.id];
+
+			if(destroyCreature === void 0){
+				return;
+			}else{
+				delete field.creatures[targetCreature.id];
+				if(destroyCreature.doLeaveBattlefield) destroyCreature.doLeaveBattlefield(field);
+			}
+		});
 	}
 })();

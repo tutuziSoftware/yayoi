@@ -8,121 +8,120 @@
   <link rel="stylesheet" type="text/css" href="lib/jasmine-2.0.0/jasmine.css">
 
   <script type="text/javascript" src="lib/jasmine-2.0.0/jasmine.js"></script>
+
   <script type="text/javascript" src="lib/jasmine-2.0.0/jasmine-html.js"></script>
   <script type="text/javascript" src="lib/jasmine-2.0.0/boot.js"></script>
-  <script type="text/javascript" src="http://localhost:3000/javascripts/jquery-2.1.1.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="/javascripts/battle_engine.js"></script>
 
   <!-- include spec files here... -->
 	<script>
-		describe("クローンフィールドの動作", function(){
-			var socket;
-			
-			beforeEach(function(done){
-				if(socket){
-					console.log("beforeEach - socket");
-					setTimeout(function(){
-						done();
-					}, 0);
-					return;
-				}
-				
-				document.cookie = "";
-				
-				//ログイン + socket.ioで通信可能にする
-				$.post("/login", {
-					"userName":"puruhime",
-					"password":"puruhime"
-				}, function(data){
-					socket = io.connect('http://localhost:3000/battle/tester');
-				
-					socket.on("connect", function(){
-						console.log("beforeEach - connect");
-						done();
-					});
-				});
-				
-				console.log("beforeEach");
-			});
-			
-			describe("フィールド形成", function(){
-				var field;
-				
-				it("shuffle APIの使用", function(done){
-					socket.on("first draw", function(_field){
-						console.log("first draw");
-						expect(_field).toBeDefined();
-						field = _field;
-						socket.removeListener("first draw", arguments.callee);
-						console.log("first draw - done");
-						done();
-						console.log("first draw - done2");
-					});
-		
-					console.log("shuffle");
-					socket.emit("shuffle");
-				});
-				
-				it("shuffle API直後のクローンフィールド", function(done){
-					socket.on("clone field!", function(_field){
-						console.log(_field);
-						expect(_field).toBeDefined();
-						expect(_field.i).toBeDefined();
-						expect(_field.i.hands.length).toEqual(5);
-						expect(_field.i.life).toEqual(20);
-						socket.removeListener("clone field!", arguments.callee);
-						console.log("clone field!");
-						done();
-					});
-					
-					console.log("clone field?");
-					socket.emit("clone field?");
-				});
-				
-				it("灰色熊を場に出す", function(done){
-					var run = false;
-					
-					socket.on("clone field!", function(_field){
-						if(run) return;
-						run = true;
-						expect(_field).toBeDefined();
-						expect(_field.i).toBeDefined();
-						expect(_field.i.hands.length).toEqual(3);
-						expect(_field.i.creatures.length).toEqual(1);
-						expect(_field.i.creatures[0].id).toEqual(field.i.hands[1].id);
-						socket.removeListener("clone field!", arguments.callee);
-						done();
-					});
-					
-					socket.emit("hand to mana", field.i.hands[0].id);
-					socket.emit("play", field.i.hands[1].id);
-					socket.emit("clone field?");
-				});
-				
-				it("灰色熊の戦闘", function(done){
-					socket.on("clone field!", function(field){
-						//戦闘前はタップなし
-						expect(field.i.creatures[0].tap).toEqual(void 0);
-						
-						socket.on("attack step", function(){
-							socket.on("clone field!", function(field){
-								//戦闘に参加させるとタップ & 攻撃フラグを立てる
-								expect(field.i.creatures[0].tap).toEqual(true);
-								expect(field.i.creatures[0].isAttack).toEqual(true);
-								socket.removeListener("clone field!", arguments.callee);
-								done();
-							});
-							
-							socket.emit("clone field?");
-						});
-						
-						socket.emit("attack step", [field.i.creatures[0].id]);
-						socket.removeListener("clone field!", arguments.callee);
-					});
-					
-					socket.emit("clone field?");
-				});
-			});
+		describe("doBlockStepのテスト", function(){
+            var field;
+            var enemyField;
+            var pairs;
+
+            beforeEach(function(){
+                field = {
+                    life:20,
+                    creatures:{
+                        '1':{
+                            "id":1,
+                            "name":"灰色熊",
+                            "cardType":"creature",
+                            "creatureType":"熊",
+                            "flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
+                            "manaCost":1,
+                            "power":2,
+                            "toughness":2
+                        }
+                    }
+                };
+
+                enemyField = {
+                    creatures:{
+                        '2':{
+                            "id":2,
+                            "name":"灰色熊",
+                            "cardType":"creature",
+                            "creatureType":"熊",
+                            "flavorText":"標準的な自然というものを教えてくれる、かわいい毛玉さ",
+                            "manaCost":1,
+                            "power":2,
+                            "toughness":2
+                        }
+                    }
+                };
+
+                pairs = [
+                    {
+                        attacker:enemyField.creatures[2],
+                        blocker:field.creatures[1]
+                    }
+                ];
+            });
+
+            it('敵をブロックし、破壊される', function(){
+                battle.doBlockStep(field, enemyField, pairs);
+
+                //自分のクリーチャーは破壊
+                expect(field.creatures[1]).not.toBeDefined();
+                console.log(field.creatures[1]);
+
+                //相手のクリーチャーは生存
+                expect(enemyField.creatures[2]).toBeDefined();
+                console.log(enemyField.creatures[2]);
+            });
+
+            it('敵をブロックし、破壊する', function(){
+                enemyField.creatures[2].power = 1;
+
+                battle.doBlockStep(field, enemyField, pairs);
+
+                //自分のクリーチャーは生存、タフネス1
+                expect(field.creatures[1]).toBeDefined();
+                expect(field.creatures[1].toughness).toBe(1);
+                console.log(field.creatures[1]);
+
+                //相手のクリーチャーは生存
+                expect(enemyField.creatures[2]).not.toBeDefined();
+                console.log(enemyField.creatures[2]);
+            });
+
+            it('敵をブロックし、ダメージを与える', function(){
+                enemyField.creatures[2].power = 1;
+                enemyField.creatures[2].toughness = 3;
+
+                battle.doBlockStep(field, enemyField, pairs);
+
+                //自分のクリーチャーは生存、タフネス1
+                expect(field.creatures[1]).toBeDefined();
+                expect(field.creatures[1].toughness).toBe(1);
+                console.log(field.creatures[1]);
+
+                //相手のクリーチャーは生存
+                expect(enemyField.creatures[2]).toBeDefined();
+                expect(field.creatures[1].toughness).toBe(1);
+                console.log(enemyField.creatures[2]);
+            });
+
+            it('敵をブロックしなかった為、ライフを減少させる', function(){
+                battle.doBlockStep(field, enemyField, [{
+                    attacker:enemyField.creatures[2]
+                }]);
+
+                //自分のクリーチャーは生存、タフネス1
+                expect(field.creatures[1]).toBeDefined();
+                expect(field.creatures[1].toughness).toBe(2);
+                console.log(field.creatures[1]);
+
+                //相手のクリーチャーは生存
+                expect(enemyField.creatures[2]).toBeDefined();
+                expect(field.creatures[1].toughness).toBe(2);
+                console.log(enemyField.creatures[2]);
+
+                //自分のライフは減少
+                expect(field.life).toBe(18);
+            });
 		});
 	</script>
 </head>
