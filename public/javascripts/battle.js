@@ -218,7 +218,7 @@ function fieldController($scope, $http){
 			 */
 			$scope.doBlockStep = function(){
 				var blockerQueue = [];
-			
+
 				//戦闘
 				$scope.block.forEach(function(pair){
 					//アタッカーとブロッカーが紐づいていない場合、処理を飛ばす
@@ -242,11 +242,11 @@ function fieldController($scope, $http){
 					var blocker = pair.blocker;
 				
 					if(blocker.toughness <= 0){
-						doCreatureDestroy(blocker);
+						doCreatureDestroy($scope.field, blocker);
 					}
 				
 					if(attacker.toughness <= 0){
-						doCreatureDestroy(attacker);
+						doCreatureDestroy($scope.field, attacker);
 					}
 				});
 			
@@ -317,15 +317,16 @@ function fieldController($scope, $http){
 		/**
 		 * 1体のクリーチャーを破壊します。
 		 */
-		function doCreatureDestroy(targetCreature){
-			[field, enemyField].forEach(function(field){
-				field.creatures.some(function(creature, index){
-					if(creature == targetCreature) {
-						field[player].creatures.splice(index, 1);
-						if(creature.doLeaveBattlefield) creature.doLeaveBattlefield(field);
-						return true;
-					}
-				});
+		function doCreatureDestroy(field, targetCreature){
+			[field, field.enemyField].forEach(function(field){
+				var destroyCreature = field.creatures[targetCreature.id];
+
+				if(destroyCreature === void 0){
+					return;
+				}else{
+					delete field.creatures[targetCreature.id];
+					if(destroyCreature.doLeaveBattlefield) destroyCreature.doLeaveBattlefield(field);
+				}
 			});
 		}
 	}
