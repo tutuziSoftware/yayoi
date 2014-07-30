@@ -217,44 +217,11 @@ function fieldController($scope, $http){
 			 * ブロック判定を行います。
 			 */
 			$scope.doBlockStep = function(){
-				var blockerQueue = [];
-
-				//戦闘
-				$scope.block.forEach(function(pair){
-					//アタッカーとブロッカーが紐づいていない場合、処理を飛ばす
-					if(pair.attacker === void 0 || pair.blocker === void 0) return;
-
-					var attacker = pair.attacker;
-					var blocker = pair.blocker;
-				
-					blocker.toughness -= attacker.power;
-				
-					if(blocker.toughness >= 1){
-						attacker.toughness -= blocker.power;
-					}
-				});
-			
-				//戦闘後、タフネスが0になったクリーチャーを墓地に送る
-				$scope.block.forEach(function(pair){
-					if(pair.attacker === void 0 || pair.blocker === void 0) return;
-
-					var attacker = pair.attacker;
-					var blocker = pair.blocker;
-				
-					if(blocker.toughness <= 0){
-						doCreatureDestroy($scope.field, $scope.enemyField, blocker);
-					}
-				
-					if(attacker.toughness <= 0){
-						doCreatureDestroy($scope.field, $scope.enemyField, attacker);
-					}
-				});
-			
-				//TODO ブロックしなかったクリーチャーはプレイヤーにダメージを与える
+				battle.doBlockStep($scope.field, $scope.enemyField, $scope.block);
 			
 				//ブロックステップの終了
 				$scope.isBlockStep = false;
-				socket.emit('block step');
+				socket.emit('block step', $scope.block);
 				socket.emit('untap step');
 			};
 		})();
@@ -285,6 +252,11 @@ function fieldController($scope, $http){
 		 * 自分のターンを終了します
 		 */
 		$scope.turnEnd = function(){
+			if($scope.field.creatures === void 0){
+				socket.emit("attack step", {});
+				return;
+			}
+
 			var creatures = Object.keys($scope.field.creatures).filter(function(key){
 				return $scope.field.creatures[key].isAttack;
 			}).map(function(key){

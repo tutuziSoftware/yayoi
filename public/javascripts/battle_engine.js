@@ -21,8 +21,6 @@ if(typeof window === "undefined"){
 	battle.doBlockStep = function(field, enemyField, pairs){
 		doBlock(field, enemyField, pairs);
 		doDirectAttack(field, pairs);
-
-		//TODO scoket.ioで処理を飛ばす
 	};
 
 	/**

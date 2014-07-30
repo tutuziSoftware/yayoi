@@ -105,8 +105,23 @@ var api = function(session, store){
 			});
 		});
 		
-		socket.on("block step", function(blockerIds){
+		socket.on("block step", function(pairs){
 			console.log("block step");
+
+			getSession(socket, store, function(error, session){
+				var battle = require('./public/javascripts/battle_engine.js');
+				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
+
+				console.log(battle);
+
+				battleModel.update(function(error, cloneField){
+					battle.doBlockStep(battleModel.cloneField, battleModel.cloneField.enemyField, pairs);
+
+					battleModel.save(function(){
+						socket.emit('untap step', cloneField);
+					});
+				});
+			});
 		});
 
 		socket.on('untap step', function(){
