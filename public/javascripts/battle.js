@@ -242,11 +242,11 @@ function fieldController($scope, $http){
 					var blocker = pair.blocker;
 				
 					if(blocker.toughness <= 0){
-						doCreatureDestroy($scope.field, blocker);
+						doCreatureDestroy($scope.field, $scope.enemyField, blocker);
 					}
 				
 					if(attacker.toughness <= 0){
-						doCreatureDestroy($scope.field, attacker);
+						doCreatureDestroy($scope.field, $scope.enemyField, attacker);
 					}
 				});
 			
@@ -317,8 +317,8 @@ function fieldController($scope, $http){
 		/**
 		 * 1体のクリーチャーを破壊します。
 		 */
-		function doCreatureDestroy(field, targetCreature){
-			[field, field.enemyField].forEach(function(field){
+		function doCreatureDestroy(field, enemyField, targetCreature){
+			[field, enemyField].forEach(function(field){
 				var destroyCreature = field.creatures[targetCreature.id];
 
 				if(destroyCreature === void 0){
