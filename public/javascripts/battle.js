@@ -253,7 +253,7 @@ function fieldController($scope, $http){
 		 */
 		$scope.turnEnd = function(){
 			if($scope.field.creatures === void 0){
-				socket.emit("attack step", {});
+				socket.emit("attack step", []);
 				return;
 			}
 
