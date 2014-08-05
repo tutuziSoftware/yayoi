@@ -79,6 +79,10 @@ var api = function(session, store){
 		
 		const ATTACK_STEP_API = "attack step";
 		socket.on(ATTACK_STEP_API, function(attackerIds){
+			console.log('--attackerIds1--');
+			console.log(attackerIds);
+			console.log('--attackerIds2--');
+
 			getSession(socket, store, function(error, session){
 				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
 
@@ -106,18 +110,15 @@ var api = function(session, store){
 		});
 		
 		socket.on("block step", function(pairs){
-			console.log("block step");
-
 			getSession(socket, store, function(error, session){
 				var battle = require('./public/javascripts/battle_engine.js');
 				var battleModel = new (require('./BattleModel.js')).BattleModel(session.userId);
-
-				console.log(battle);
 
 				battleModel.update(function(error, cloneField){
 					battle.doBlockStep(battleModel.cloneField, battleModel.cloneField.enemyField, pairs);
 
 					battleModel.save(function(){
+						socket.emit('clone field!', battleModel.cloneField);
 						socket.emit('untap step', battleModel.cloneField);
 					});
 				});

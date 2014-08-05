@@ -73,7 +73,15 @@ if(typeof window === "undefined"){
 		var unblock = pairs.filter(function(pair){
 			return pair.attacker !== void 0 && pair.blocker === void 0;
 		});
+
+		console.log('--unblock1--');
+		console.log(unblock);
+		console.log('--unblock2--');
+
 		unblock.forEach(function(attacker){
+			console.log('--attacker.attacker.power1--');
+			console.log(attacker.attacker.power);
+			console.log('--attacker.attacker.power2--');
 			field.life -= attacker.attacker.power;
 		});
 	}
