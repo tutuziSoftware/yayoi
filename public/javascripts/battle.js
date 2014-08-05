@@ -67,6 +67,7 @@ function fieldController($scope, $http){
 
 			socket.on('untap step', function(field){
 				$scope.field = checkField(field);
+				$scope.block = [];
 				$scope.$apply();
 			});
 
@@ -88,6 +89,7 @@ function fieldController($scope, $http){
 		});
 	
 		$scope.socket = socket;
+		$scope.block = [];
 	
 		//敵を含むすべての場のルート
 		field = $scope.field = {
@@ -204,7 +206,6 @@ function fieldController($scope, $http){
 		 * ブロックステップに関する関数群です。
 		 */
 		(function(){
-			$scope.block = [];
 			$scope.enemyAttacker = {};
 			var selectBlocker;
 		
@@ -228,6 +229,9 @@ function fieldController($scope, $http){
 			 * ブロック判定を行います。
 			 */
 			$scope.doBlockStep = function(){
+				console.log('--doBlockStep1--');
+				console.log($scope.block);
+				console.log('--doBlockStep2--');
 				battle.doBlockStep($scope.field, $scope.enemyField, $scope.block);
 			
 				//ブロックステップの終了

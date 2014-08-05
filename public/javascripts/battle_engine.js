@@ -70,6 +70,10 @@ if(typeof window === "undefined"){
 	 * @param pairs
 	 */
 	function doDirectAttack(field, pairs){
+		console.log('--pairs1--');
+		console.log(pairs);
+		console.log('--pairs2--');
+
 		var unblock = pairs.filter(function(pair){
 			return pair.attacker !== void 0 && pair.blocker === void 0;
 		});
