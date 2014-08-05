@@ -43,20 +43,20 @@ function fieldController($scope, $http){
 		
 			socket.on("first draw", function(field){
 				console.log("first draw");
-				$scope.field = field;
+				$scope.field = checkField(field);
 				$scope.$apply();
 			});
 			
 			socket.on('enemy', function(enemyField){
 				console.log('enemy hand to mana');
 				console.log(enemyField);
-				$scope.enemyField = enemyField;
+				$scope.enemyField = checkField(enemyField);
 				$scope.$apply();
 			});
 			
 			socket.on('block step', function(enemyField){
 				console.log('block step');
-				$scope.enemyField = enemyField;
+				$scope.enemyField = checkField(enemyField);
 				$scope.$apply();
 
 				//TODO ブロックステップ開始時の処理をここに置く
@@ -66,14 +66,25 @@ function fieldController($scope, $http){
 			});
 
 			socket.on('untap step', function(field){
-				$scope.field = field;
+				$scope.field = checkField(field);
 				$scope.$apply();
 			});
 
 			socket.on('clone field!', function(field){
-				$scope.field = field;
+				$scope.field = checkField(field);
 				$scope.$apply();
 			});
+
+			/**
+			 * socket.ioからくるfieldを調べ、必要な値が入ってない場合は初期値を代入します。
+			 * @param field
+			 * @returns field
+			 */
+			function checkField(field){
+				if(field.creatures === void 0) field.creatures = {};
+
+				return field;
+			}
 		});
 	
 		$scope.socket = socket;
