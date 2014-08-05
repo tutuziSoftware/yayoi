@@ -118,7 +118,7 @@ var api = function(session, store){
 					battle.doBlockStep(battleModel.cloneField, battleModel.cloneField.enemyField, pairs);
 
 					battleModel.save(function(){
-						socket.emit('untap step', cloneField);
+						socket.emit('untap step', battleModel.cloneField);
 					});
 				});
 			});
